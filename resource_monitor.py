@@ -19,6 +19,6 @@ def get_process_cpu_memory(pid: int):
     return
 
 
-r = get_process_used_gpu_memory(12184)
+r = get_process_used_gpu_memory(28880)
 print(r)
-get_process_cpu_memory(12184)
+get_process_cpu_memory(28880)

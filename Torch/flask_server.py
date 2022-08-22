@@ -35,7 +35,6 @@ app = Flask(__name__)
 def inference():
     files = request.files
     image_bytes = files['image_bytes'].read()
-    # image_info = json.loads(files['image_info'].read().decode('utf-8'))
 
     img = Image.open(BytesIO(image_bytes))
     x = transform(img).unsqueeze(0)     # [1, 3, 224, 224]

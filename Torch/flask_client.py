@@ -46,15 +46,12 @@ if __name__ == '__main__':
         img.save(buffer, format=_format)
         img_bytes = buffer.getvalue()
 
-        url = f'http://{args.ip}:{args.port}/{args.api}'
-        files = {
-            'image_bytes': img_bytes,
-            # 'image_info': json.dumps({'mode': img.mode, 'size': img.size, 'format': _format})
-        }
         ss = time.time()
-        res = requests.post(url, files=files).json()
+        resp = requests.post(url=f'http://{args.ip}:{args.port}/{args.api}',
+                             files={'image_bytes': img_bytes})
         resp_time = time.time() - s
 
+        res = resp.json()
         res['resp_time'] = resp_time
         infer_time_list.append(res['resp_time'])
         infer_time_list.append(res['infer_time'])

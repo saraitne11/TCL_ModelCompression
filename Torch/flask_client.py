@@ -1,17 +1,15 @@
 import torchvision
-import torch.utils.data as data
 
-import numpy as np
+import os
 import requests
 import argparse
-import json
 import time
 import logging
 
 from io import BytesIO
 
 
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--imagenet_dir', required=True, type=str,
                         help="ImageNet Validation Data Directory")
@@ -25,6 +23,8 @@ if __name__ == '__main__':
                         help="Target flask api")
 
     args = parser.parse_args()
+
+    os.makedirs(os.path.dirname(args.log_file), exist_ok=True)
 
     logger = logging.getLogger('FLASK')
     logger.setLevel(logging.INFO)
@@ -60,3 +60,7 @@ if __name__ == '__main__':
 
     for hdlr in logger.handlers:
         hdlr.close()
+
+
+if __name__ == '__main__':
+    main()

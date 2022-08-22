@@ -8,7 +8,6 @@ from PIL import Image
 from io import BytesIO
 
 import argparse
-import json
 import time
 
 from torch_models import get_model

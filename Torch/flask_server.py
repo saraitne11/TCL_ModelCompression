@@ -4,11 +4,9 @@ from flask import Flask
 from flask import request
 from flask import jsonify
 
-from PIL import Image
-from io import BytesIO
-
 import argparse
-import time
+import pickle
+from timeit import default_timer as timer
 
 from torch_models import get_model
 
@@ -21,7 +19,7 @@ parser.add_argument('--port', required=True, type=int,
                     help="Flask Server Port")
 args = parser.parse_args()
 
-model, transform, categories = get_model(args.model)
+model, categories = get_model(args.model)
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 model = model.to(device)
@@ -30,34 +28,37 @@ model = model.eval()
 app = Flask(__name__)
 
 
+@app.route('/model', methods=['GET'])
+def get_model():
+    return {'model': args.model}
+
+
 @app.route('/inference', methods=['POST'])
 def inference():
     files = request.files
-    image_bytes = files['image_bytes'].read()
+    images_byte = files['images_byte'].read()
+    x = pickle.loads(images_byte)       # [B, C, H, W]
 
-    img = Image.open(BytesIO(image_bytes))
-    x = transform(img).unsqueeze(0)     # [1, 3, 224, 224]
+    s = timer()
     x = x.to(device)
-    s = time.time()
     output = model(x)
-    infer_time = time.time() - s
+    infer_time = timer() - s
 
     _, top1 = output.max(1)
+    top1_id = top1.tolist()
+    # top1_name = list(map(lambda _id: categories[_id], top1_id))
+
     _, top5 = output.topk(5, 1, True, True)
-    top1 = top1[0]      # 1 batch
-    top5 = top5[0]      # 1 batch
-
-    top1_id = top1.item()
-    top1_name = categories[top1_id]
-
-    top5_ids = top5.tolist()
-    top5_names = list(map(lambda _id: categories[_id], top5_ids))
+    top5_id = top5.tolist()
+    # top5_name = []
+    # for b in top5_id:
+    #     top5_name.append(list(map(lambda _id: categories[_id], b)))
 
     res = {
         'top1_id': top1_id,
-        'top1_name': top1_name,
-        'top5_ids': top5_ids,
-        'top5_names': top5_names,
+        # 'top1_name': top1_name,
+        'top5_id': top5_id,
+        # 'top5_name': top5_name,
         'infer_time': infer_time
     }
     return jsonify(res)

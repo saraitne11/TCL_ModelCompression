@@ -27,7 +27,6 @@ def main():
                         help="Batch Size")
     parser.add_argument('--loader_workers', type=int, default=2,
                         help="DataLoader Workers")
-
     args = parser.parse_args()
 
     os.makedirs(os.path.dirname(args.log_file), exist_ok=True)
@@ -48,6 +47,8 @@ def main():
     s = timer()
     infer_time_list = []
     resp_time_list = []
+    n_top1 = 0
+    n_top5 = 0
     dataset = torchvision.datasets.ImageNet(root=args.imagenet_dir, transform=transform, split='val')
     loader = data.DataLoader(dataset, batch_size=args.batch_size, shuffle=False, num_workers=args.loader_workers)
     n_data = len(dataset)
@@ -65,12 +66,25 @@ def main():
         infer_time_list.append(res['resp_time'])
         resp_time_list.append(res['infer_time'])
 
-        logger.info(f"InferTime: {res['infer_time']:0.4f}, RespTime: {res['resp_time']:0.4f}, "
-                    f"BatchSize: {len(labels)}, Top1: {res['top1_id']}, Top5: {res['top5_id']}")
+        n_top1 += 999
+        n_top5 += 999
 
         i += len(labels)
-        print(f'\r({i}/{n_data})', end='')
-    print()
+        logger.info(f"BatchSize: {len(labels)}, Progress: {i}/{n_data}, "
+                    f"InferTime: {res['infer_time']:0.4f}, RespTime: {res['resp_time']:0.4f}")
+        # logger.info(f"BatchSize: {len(labels)}, Progress: {i}/{n_data}, "
+        #             f"InferTime: {res['infer_time']:0.4f}, RespTime: {res['resp_time']:0.4f}, "
+        #             f"Top1: {res['top1_id']}, Top5: {res['top5_id']}")
+
+    total_time = timer() - s
+    avg_infer_time = sum(infer_time_list)/len(infer_time_list)
+    avg_resp_time = sum(resp_time_list)/len(resp_time_list)
+    top1_acc = n_top1 / n_data
+    top5_acc = n_top5 / n_data
+    logger.info(f"TotalTime: {total_time:0.4f}, "
+                f"AvgInferTime: {avg_infer_time:0.4f}, AvgRespTime: {avg_resp_time:0.4f}"
+                f"Top1Acc: {top1_acc:0.4f}, Top5Acc: {top5_acc:0.4f}")
+
     for hdlr in logger.handlers:
         hdlr.close()
 

@@ -1,24 +1,28 @@
 import subprocess
 import psutil
 
-
-def get_process_used_gpu_memory(pid: int):
-    cmd = 'nvidia-smi --query-compute-apps=pid,used_gpu_memory --format=csv,noheader'
-    out = subprocess.check_output(cmd)
-    out = list(filter(lambda x: str(pid) in x, out.decode().split('\n')))
-    if len(out) == 1:
-        return out[0]
-    else:
-        return ''
+from typing import Tuple
 
 
-def get_process_cpu_memory(pid: int):
+def get_proc_memory(pid: int) -> int:
     p = psutil.Process(pid)
-    print(p.memory_info().rss / 2 ** 20)
-    print(p.cpu_percent())
+    return p.memory_info().rss / 2 ** 20
+
+
+def get_gpu_proc_memory() -> Tuple[str, int, int, int]:
+    """
+    :return: (Process Name, PID, Memory Usage, GPU Memory Usage)
+    """
+    cmd = ['nvidia-smi', '--query-compute-apps=process_name,pid,used_gpu_memory', '--format=csv,noheader']
+    out = subprocess.check_output(cmd)
+    total_usage = 0
+    for _line in out.decode().split('\n'):
+        if 'MiB' in _line:
+
+            proc_usage = _line[0:_line.index(' MiB')]
+            total_usage += int(proc_usage)
     return
 
 
-r = get_process_used_gpu_memory(28880)
-print(r)
-get_process_cpu_memory(28880)
+gpu_mem_usage = get_gpu_proc_memory()
+print(gpu_mem_usage)

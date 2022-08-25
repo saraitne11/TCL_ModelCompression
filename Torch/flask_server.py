@@ -6,6 +6,7 @@ from flask import jsonify
 
 import argparse
 import pickle
+import json
 from timeit import default_timer as timer
 
 from torch_models import get_model
@@ -19,7 +20,9 @@ parser.add_argument('--port', required=True, type=int,
                     help="Flask Server Port")
 args = parser.parse_args()
 
-model, categories = get_model(args.model)
+model = get_model(args.model)
+with open('imagenet.json', 'r') as f:
+    categories = json.loads(f.read())
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 model = model.to(device)

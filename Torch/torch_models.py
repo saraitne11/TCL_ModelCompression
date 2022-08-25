@@ -1,27 +1,25 @@
+import torch
 import torchvision
+import os
 
 
-def get_model(model_name: str):
+def get_model(model_name: str, model_dir='./Models'):
     if model_name == 'resnet':
-        w = torchvision.models.resnet.ResNet152_Weights.IMAGENET1K_V1
-        model = torchvision.models.resnet152(weights=w)
+        model = torch.load(os.path.join(model_dir, 'ResNet152_Base.pth'))
 
     elif model_name == 'efficientnet':
-        w = torchvision.models.efficientnet.EfficientNet_V2_L_Weights.IMAGENET1K_V1
-        model = torchvision.models.efficientnet_v2_l(weights=w)
+        model = torch.load(os.path.join(model_dir, 'EfficientNet_V2_L_Base.pth'))
 
     elif model_name == 'densenet':
-        w = torchvision.models.densenet.DenseNet201_Weights.IMAGENET1K_V1
-        model = torchvision.models.densenet201(weights=w)
+        model = torch.load(os.path.join(model_dir, 'DenseNet201_Base.pth'))
 
     elif model_name == 'mobilenet':
-        w = torchvision.models.mobilenetv2.MobileNet_V2_Weights.IMAGENET1K_V1
-        model = torchvision.models.mobilenet_v2(weights=w)
+        model = torch.load(os.path.join(model_dir, 'MobileNet_V2_Base.pth'))
+
     else:
         raise ValueError(f"model_name {model_name} is invalid")
-    categories = w.meta['categories']
 
-    return model, categories
+    return model
 
 
 def get_transform(model_name: str):

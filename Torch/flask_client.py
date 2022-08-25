@@ -1,3 +1,4 @@
+import numpy as np
 import torchvision
 import torch.utils.data as data
 
@@ -63,11 +64,11 @@ def main():
 
         res = resp.json()
         res['resp_time'] = resp_time
-        infer_time_list.append(res['resp_time'])
-        resp_time_list.append(res['infer_time'])
+        infer_time_list.append(res['infer_time'])
+        resp_time_list.append(res['resp_time'])
 
-        n_top1 += 999
-        n_top5 += 999
+        n_top1 += np.equal(res['top1_id'], labels).sum()
+        n_top5 += np.max(np.isin(res['top5_id'], labels), 1).sum()
 
         i += len(labels)
         logger.info(f"BatchSize: {len(labels)}, Progress: {i}/{n_data}, "
@@ -81,9 +82,10 @@ def main():
     avg_resp_time = sum(resp_time_list)/len(resp_time_list)
     top1_acc = n_top1 / n_data
     top5_acc = n_top5 / n_data
-    logger.info(f"TotalTime: {total_time:0.4f}, "
-                f"AvgInferTime: {avg_infer_time:0.4f}, AvgRespTime: {avg_resp_time:0.4f}"
-                f"Top1Acc: {top1_acc:0.4f}, Top5Acc: {top5_acc:0.4f}")
+    logger.info(f"TotalTime: {total_time:0.4f}")
+    logger.info(f"TotalInferTime: {sum(infer_time_list):0.4f}, TotalRespTime: {sum(resp_time_list):0.4f}")
+    logger.info(f"AvgInferTime: {avg_infer_time:0.4f}, AvgRespTime: {avg_resp_time:0.4f}")
+    logger.info(f"Top1Acc: {top1_acc:0.4f}, Top5Acc: {top5_acc:0.4f}")
 
     for hdlr in logger.handlers:
         hdlr.close()

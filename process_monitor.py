@@ -7,7 +7,7 @@ import signal
 import time
 
 from logging.handlers import RotatingFileHandler
-from typing import Dict
+from typing import Tuple
 
 
 SIG_KILL = False
@@ -20,17 +20,11 @@ def signal_handler(signum, frame):
     return
 
 
-def get_proc_memory(pid: int) -> int:
-    """
-    pid: Process ID
-    :return: MiB
-    """
-    p = psutil.Process(pid)
-    mem = p.memory_info().rss / 2 ** 20
-    return int(mem)
+def get_proc_memory(_p: psutil.Process) -> int:
+    return int(_p.memory_info().rss / 2 ** 20)
 
 
-def get_gpu_proc_info(_pid: int) -> Dict:
+def get_gpu_proc_info(_pid: int) -> Tuple[str, int]:
     """
     :return: {'PNAME': pname(str), 'PID': pid(int), 'GPU_MEM': xxx(int, MiB), 'MEM': xxx(int, MiB)}
     """
@@ -39,24 +33,19 @@ def get_gpu_proc_info(_pid: int) -> Dict:
     out = out.decode().split('\n')
     proc_info = list(filter(lambda x: str(_pid) in x, out))
     if not proc_info:
-        return dict()
+        return '', 0
 
     proc_info = proc_info[0]
     if 'MiB' not in proc_info:
-        _line = proc_info.replace('[N/A]', '0 MiB')
+        proc_info = proc_info.replace('[N/A]', '0 MiB')
     items = list(map(str.strip, proc_info.split(',')))
     pname = items[0]
-    pid = int(items[1])
     _s = items[2]
-    p_gpu_mem = int(_s[:_s.index(' MiB')])
-    try:
-        p_mem = get_proc_memory(pid)
-    except psutil.NoSuchProcess:
-        p_mem = -1
-    return {'PNAME': pname, 'PID': pid, 'GPU_MEM': p_gpu_mem, 'MEM': p_mem}
+    gpu_mem = int(_s[:_s.index(' MiB')])
+    return pname, gpu_mem
 
 
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--target_pid', required=True, type=int,
                         help="Logging Target Process ID")
@@ -88,13 +77,22 @@ if __name__ == '__main__':
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
 
+    pid = args.target_pid
+    p = psutil.Process(pid)
+
     logging_time = time.time() + args.log_period
     while True:
         cur_time = time.time()
         if logging_time < cur_time:
-            logger.info(get_gpu_proc_info(args.target_pid))
+            pname, gpu_mem = get_gpu_proc_info(pid)
+            mem = get_proc_memory(p)
+            logger.info(f"{pname}({pid}), Memory: {mem} MiB, GPU Memory: {gpu_mem} MiB")
             logging_time = cur_time + args.log_period
 
         time.sleep(1)
         if SIG_KILL:
             break
+
+
+if __name__ == '__main__':
+    main()

@@ -3,6 +3,7 @@
 
 nohup.out
 Torch/Models/*.pth
+Torch/Transforms/*.pth
 
 __pycache__
 .idea

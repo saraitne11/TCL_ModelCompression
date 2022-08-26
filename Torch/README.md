@@ -1,4 +1,4 @@
-# 딥러닝 모델 압축 성능 평가 - PyTorch
+# Model Compression Evaluation - PyTorch
 
 ## Environments
 - Python3.6 or later
@@ -6,7 +6,7 @@
 - torchvision 0.11.2
 
 ## Models
-torchvision 패키지에서 제공하는 imagenet classification 모델
+imagenet classification Models from `torchvision 0.11.2` 
 - torchvision.models.resnet152
 - torchvision.models.densenet201
 - torchvision.models.efficientnet_b7

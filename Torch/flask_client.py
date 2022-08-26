@@ -33,7 +33,7 @@ def main():
 
     os.makedirs(os.path.dirname(args.log_file), exist_ok=True)
 
-    logger = logging.getLogger('FLASK')
+    logger = logging.getLogger('FLASK_CLIENT')
     logger.setLevel(logging.INFO)
 
     handler = logging.FileHandler(args.log_file, mode='a')

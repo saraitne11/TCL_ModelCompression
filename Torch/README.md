@@ -1,14 +1,31 @@
-# Torch Model Evaluation
-- Model: torchvision image classification models
-  - torchvision.models.resnet152
-  - torchvision.models.densenet201
-  - torchvision.models.efficientnet_v2_l
-  - torchvision.models.mobilenet_v2
-- Data: ILSVRC2012 validation images (50,000 image) 
+# 딥러닝 모델 압축 성능 평가 - PyTorch
+
+## Framework
+- PyTorch 1.10
+- torchvision 0.11
+
+## Models
+torchvision 패키지에서 제공하는 imagenet classification 모델
+- torchvision.models.resnet152
+- torchvision.models.densenet201
+- torchvision.models.efficientnet_b7
+- torchvision.models.mobilenet_v2
+
+## Data
+ILSVRC2012 validation images (50,000 image) 
+
+## Devices
+- AMD 3990X ThreadRipper / Nvidia RTX 3090 24GB / RAM 128GB
+- Nvidia Jetson Nano 4GB
 
 ## Model Servings
 - Flask
 - Nvidia Triton (TBD)
+
+## Model Compression
+- TensorRT
+- Pruning
+- Quantization
 
 ### Flask Serving
 - Build Docker Image

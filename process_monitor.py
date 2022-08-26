@@ -62,7 +62,7 @@ def main():
     if os.path.dirname(args.log_file):
         os.makedirs(os.path.dirname(args.log_file), exist_ok=True)
 
-    logger = logging.getLogger('FLASK')
+    logger = logging.getLogger('PROCESS_MONITOR')
     logger.setLevel(logging.INFO)
 
     handler = RotatingFileHandler(args.log_file,

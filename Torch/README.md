@@ -1,8 +1,8 @@
 # 딥러닝 모델 압축 성능 평가 - PyTorch
 
 ## Framework
-- PyTorch 1.10
-- torchvision 0.11
+- PyTorch 1.10.1
+- torchvision 0.11.2
 
 ## Models
 torchvision 패키지에서 제공하는 imagenet classification 모델

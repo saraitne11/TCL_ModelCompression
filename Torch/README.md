@@ -1,6 +1,7 @@
 # 딥러닝 모델 압축 성능 평가 - PyTorch
 
-## Framework
+## Environments
+- Python3.6 or later
 - PyTorch 1.10.1
 - torchvision 0.11.2
 

@@ -1,4 +1,4 @@
-FROM pytorch/pytorch:1.12.1-cuda11.3-cudnn8-devel
+FROM pytorch/pytorch:1.10.0-cuda11.3-cudnn8-devel
 COPY ./Models/*.pth /app/Models/
 COPY ./flask_server.py /app
 COPY ./imagenet.json /app

@@ -9,18 +9,18 @@ import pickle
 import json
 from timeit import default_timer as timer
 
-from torch_models import get_model
 
+MODEL_DIR = './Models/'
 
-model_list = ['resnet', 'efficientnet', 'densenet', 'mobilenet']
 parser = argparse.ArgumentParser()
 parser.add_argument('--model', required=True, type=str,
-                    help="One of [resnet, efficientnet, densenet, mobilenet]")
+                    help="PyTorch Model File Path (.pth file)")
 parser.add_argument('--port', required=True, type=int,
                     help="Flask Server Port")
 args = parser.parse_args()
 
-model = get_model(args.model)
+model_file = args.model if args.model.endswith('.pth') else args.model + '.pth'
+model = torch.load(MODEL_DIR + model_file)
 with open('imagenet.json', 'r') as f:
     categories = json.loads(f.read())
 
@@ -33,7 +33,7 @@ app = Flask(__name__)
 
 @app.route('/model', methods=['GET'])
 def get_model():
-    return {'model': args.model}
+    return {'model': model_file}
 
 
 @app.route('/inference', methods=['POST'])

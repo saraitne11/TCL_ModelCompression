@@ -1,7 +1,8 @@
-import numpy as np
+import torch
 import torchvision
 import torch.utils.data as data
 
+import numpy as np
 import pickle
 import os
 import requests
@@ -11,7 +12,7 @@ from timeit import default_timer as timer
 
 from io import BytesIO
 
-from torch_models import get_transform
+TRANSFORM_DIR = './Transforms/'
 
 
 def main():
@@ -42,8 +43,8 @@ def main():
     logger.addHandler(handler)
 
     resp = requests.get(url=f'http://{args.ip}:{args.port}/model')
-    _model = resp.json()['model']
-    transform = get_transform(_model)
+    model_file = resp.json()['model']
+    transform = torch.load(TRANSFORM_DIR + model_file)
 
     s = timer()
     infer_time_list = []

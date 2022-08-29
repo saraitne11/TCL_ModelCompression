@@ -20,7 +20,11 @@ parser.add_argument('--port', required=True, type=int,
 args = parser.parse_args()
 
 model_file = args.model if args.model.endswith('.pth') else args.model + '.pth'
-model = torch.load(MODEL_DIR + model_file)
+if 'script' in model_file:
+    model = torch.jit.load(MODEL_DIR + model_file)
+else:
+    model = torch.load(MODEL_DIR + model_file)
+
 with open('imagenet.json', 'r') as f:
     categories = json.loads(f.read())
 

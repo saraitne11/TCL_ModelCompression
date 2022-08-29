@@ -4,6 +4,7 @@
 nohup.out
 Torch/Models/*.pth
 Torch/Transforms/*.pth
+Torch/torchvision/
 
 __pycache__
 .idea

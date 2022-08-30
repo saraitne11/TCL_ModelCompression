@@ -27,6 +27,8 @@ def main():
                         help="Target flask server port")
     parser.add_argument('--batch_size', type=int, default=1,
                         help="Batch Size")
+    parser.add_argument('--transform_dir', type=str, default='./Transforms/',
+                        help="Transform file directory")
     parser.add_argument('--loader_workers', type=int, default=2,
                         help="DataLoader Workers")
     args = parser.parse_args()
@@ -44,7 +46,7 @@ def main():
 
     resp = requests.get(url=f'http://{args.ip}:{args.port}/model')
     model_file = resp.json()['model']
-    transform = torch.load(TRANSFORM_DIR + model_file)
+    transform = torch.load(os.path.join(args.transform_dir, model_file))
 
     s = timer()
     infer_time_list = []

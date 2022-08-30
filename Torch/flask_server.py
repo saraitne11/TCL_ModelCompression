@@ -10,20 +10,21 @@ import json
 from timeit import default_timer as timer
 
 
-MODEL_DIR = './Models/'
-
 parser = argparse.ArgumentParser()
 parser.add_argument('--model', required=True, type=str,
-                    help="PyTorch Model File Path (.pth file)")
+                    help="Model File Name")
 parser.add_argument('--port', required=True, type=int,
                     help="Flask Server Port")
+parser.add_argument('--model_dir', type=str, default='./Models/',
+                    help="Model Repository(Dir)")
 args = parser.parse_args()
 
 model_file = args.model if args.model.endswith('.pth') else args.model + '.pth'
+model_dir = args.model_dir if args.model_dir.endswith('/') else args.model_dir + '/'
 if 'script' in model_file:
-    model = torch.jit.load(MODEL_DIR + model_file)
+    model = torch.jit.load(model_dir + model_file)
 else:
-    model = torch.load(MODEL_DIR + model_file)
+    model = torch.load(model_dir + model_file)
 
 with open('imagenet.json', 'r') as f:
     categories = json.loads(f.read())

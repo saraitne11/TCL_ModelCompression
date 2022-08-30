@@ -64,9 +64,9 @@ $ sudo docker build -t flask_app/torch .
 ```
 - Run Docker Container
 ```bash
-$ sudo docker run -d --gpus all -p <host port>:<container port> --name flask_app flask_app/torch python flask_server.py --model <.pth file> --port <container port>
+$ sudo docker run -d --gpus all -v <host model dir>:<container model dir> -p <host port>:<container port> --name flask_app flask_app/torch python flask_server.py --model <.pth file> --port <container port>
 # Example
-$ sudo docker run -d --gpus all -p 2222:2222 --name flask_app flask_app/torch python flask_server.py --model resnet152-base.pth --port 2222
+$ sudo docker run -d --gpus all -v $(pwd)/Models:/app/Models -p 2222:2222 --name flask_app flask_app/torch python flask_server.py --model resnet152-base.pth --port 2222
 ```
 - Check flask_app response
 ```bash

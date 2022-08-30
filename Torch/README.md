@@ -10,7 +10,7 @@ TensorRT는 Container 내에서 작업 필수 (Local System 보호)
      - densenet201-onnx_trt_fp16.plan
 
 
-- 윤정식 M: TensorRT-JetsonNano
+- 김경록 M: TensorRT-JetsonNano
   - torch -> torch_trt (FP32, FP16, INT8)
     - densenet201-jn-torch_trt_fp16.pth
   - torch -> onnx -> onnx_trt (FP32, FP16, INT8)
@@ -22,8 +22,10 @@ TensorRT는 Container 내에서 작업 필수 (Local System 보호)
 
 
 - 이장원 M: Triton Client 개발
-- 이장원 M: Desktop 실험
-- Jetson Nano 실험
+- 이장원 M: Desktop 실험 (Flask)
+- 이장원 M: Jetson Nano 실험 (Flask)
+- Desktop 실험 (Triton)
+- Jetson Nano 실험 (Triton)
 
 
 ## Environments

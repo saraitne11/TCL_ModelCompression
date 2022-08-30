@@ -1,5 +1,31 @@
 # Model Compression Evaluation - PyTorch
 
+## R&R
+### https://catalog.ngc.nvidia.com/orgs/nvidia/containers/tensorrt
+TensorRT는 Container 내에서 작업 필수 (Local System 보호)
+ - 박용서 M: TensorRT-Desktop
+   - torch -> torch_trt (FP32, FP16, INT8)
+     - densenet201-torch_trt_fp16.pth
+   - torch -> onnx -> onnx_trt (FP32, FP16, INT8)
+     - densenet201-onnx_trt_fp16.plan
+
+
+- 윤정식 M: TensorRT-JetsonNano
+  - torch -> torch_trt (FP32, FP16, INT8)
+    - densenet201-jn-torch_trt_fp16.pth
+  - torch -> onnx -> onnx_trt (FP32, FP16, INT8)
+    - densenet201-jn-onnx_trt_fp16.plan
+
+
+- 김경록 M: Pruning
+  - densenet201-pruning.pth
+
+
+- 이장원 M: Triton Client 개발
+- 이장원 M: Desktop 실험
+- Jetson Nano 실험
+
+
 ## Environments
 - Python3.6 or later
 - PyTorch 1.10.1

@@ -2,8 +2,9 @@
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
 nohup.out
-Torch/Models/*.pth
-Torch/Transforms/*.pth
+Torch/FlaskModels/
+Torch/TritonModels/
+Torch/Transforms/
 Torch/torchvision/
 
 __pycache__

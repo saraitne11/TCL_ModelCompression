@@ -57,39 +57,131 @@ ILSVRC2012 validation images (50,000 image)
 - Quantization
 
 ### Flask Serving
+- Before Run Triton Model Serving, Check `./Flask/Models/` directory.
+- if there's no `./Flask/Models/` directory, Run download_xxx_models.ipynb By Jupyter Notebook to download model files.
 - Build Docker Image
 ```bash
 $ cd TCL_ModelCompression/Torch
 $ sudo docker build -t flask_app/torch .
 ```
-- Run Docker Container
+- Run Flask Server Container
 ```bash
-$ sudo docker run -d --gpus all -v <host model dir>:<container model dir> -p <host port>:<container port> --name flask_app flask_app/torch python flask_server.py --model <.pth file> --port <container port>
+$ sudo docker run \
+--rm --gpus all \
+-v <host model dir>:<flask model repository> \
+-p <host port>:<container port> \
+--name <container name> \
+flask_app/torch \
+python flask_server.py --model-repository <flask model repository> \
+--model <.pth file> --port <container port>
+
 # Example
-$ sudo docker run -d --gpus all -v $(pwd)/FlaskModels:/app/Models -p 2222:2222 --name flask_app flask_app/torch python flask_server.py --model resnet152-base.pth --port 2222
+$ sudo docker run \
+--rm --gpus all \
+-v $(pwd)/Flask/Models:/Models \
+-p 8000:8000 \
+--name flask_app \
+flask_app/torch \
+python flask_server.py --model-repository=/Models \
+--model resnet152-script.pth --port 8000
 ```
 - Check flask_app response
 ```bash
 $ curl -X GET "http://<ip>:<port>/model"
 # Example
-$ curl -X GET "http://127.0.0.1:2222/model"
-# {"model":"resnet152-base.pth"}
+$ curl -X GET "http://127.0.0.1:8000/model"
+# {"model":"resnet152-script.pth"}
 ```
 - Check flask_app Process ID using `nvidia-smi`
 - Run `process_monitor.py` for gpu memory usage of torch model
 ```bash
-$ nohup python ../process_monitor.py --target_pid <pid> --log_file <log_file> &
+$ python ../process_monitor.py --target_pid <pid> --log_file <log_file>
 # Example
-$ nohup python ../process_monitor.py --target_pid 31888 --log_file monitors/resnet152-base.log &
+$ python ../process_monitor.py --target_pid 31888 --log_file Flask/Monitors/resnet152-script-b1.log
 ```
 - Run `flask_client.py`
 ```bash
-$ python flask_client.py --imagenet_dir <dir> --log_file <log_file> --ip <flask_app_ip> --port <flask_app_port> --batch_size <batch_size>
+$ python flask_client.py \
+--imagenet_dir <dir> \
+--log_file <log_file> \
+--ip <flask_app_ip> \
+--port <flask_app_port> \
+--batch_size <batch_size>
+
 # Example
-$ python flask_client.py --imagenet_dir /home/data/ImageNet/ --log_file results/resnet152-base.log --ip localhost --port 2222 --batch_size 2
+$ python flask_client.py \
+--imagenet_dir /home/data/ImageNet/ \
+--log_file Flask/Results/resnet152-script-b1.log \
+--ip localhost \
+--port 8000 \
+--batch_size 1
 ```
 
 ### Nvidia Triton Serving
+- Before Run Triton Model Serving, Check `./Triton/Models/` directory.
+- if there's no `./Triton/Models/` directory, Run download_xxx_models.ipynb By Jupyter Notebook to download model files.
+- Check structure of `./Trition/Models/` directory and `config.pbtxt`.
+- Change Directory
+```bash
+$ cd TCL_ModelCompression/Torch
 ```
-TBD
+- Run Triton Server Container
+```bash
+$ sudo docker run \
+--rm --gpus all \
+-v <host model dir>:<triton model repository> \
+-p <host port1>:<trtion HTTP port> \
+-p <host port2>:<trtion gRPC port> \
+-p <host port3>:<trtion Metrics port> \
+--name <container name>
+nvcr.io/nvidia/tritonserver:22.08-py3 \
+tritonserver --model-repository=<triton model repository> \
+--model-control-mode=explicit \
+--load-model=<model_name>
+
+# Example
+$ sudo docker run \
+--rm --gpus all \
+-v $(pwd)/Triton/Models:/Models \
+-p 8000:8000 \
+-p 8001:8001 \
+-p 8002:8002 \
+--name triton_app \
+nvcr.io/nvidia/tritonserver:22.08-py3 \
+tritonserver --model-repository=/Models \
+--model-control-mode=explicit \
+--load-model=resnet152-script
+```
+- Check triton app response
+```bash
+$ curl -X GET "http://<ip>:<port>/metrics"
+# Example
+$ curl -X GET "http://localhost:8002/metrics"
+# Triton Metric Text...
+```
+- Check flask_app Process ID using `nvidia-smi`
+- Run `process_monitor.py` for gpu memory usage of torch model
+```bash
+$ python ../process_monitor.py --target_pid <pid> --log_file <log_file>
+# Example
+$ python ../process_monitor.py --target_pid 31888 --log_file Triton/Monitors/resnet152-script-http-b1.log
+```
+- Run `triton_client.py`
+```bash
+$ python triton_client.py \
+--imagenet_dir <dir> \
+--log_file <log_file> \
+--ip <triton_app_ip> \
+--port <triton_app http/grpc port> \
+--protocol <http/grpc> \
+--batch_size <batch_size>
+
+# Example
+$ python triton_client.py \
+--imagenet_dir /home/data/ImageNet/ \
+--log_file Triton/Results/resnet152-script-http-b1.log \
+--ip localhost \
+--port 8000 \
+--protocol http \
+--batch_size 1
 ```

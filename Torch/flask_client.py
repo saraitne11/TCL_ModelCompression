@@ -12,8 +12,6 @@ from timeit import default_timer as timer
 
 from io import BytesIO
 
-TRANSFORM_DIR = './Transforms/'
-
 
 def main():
     parser = argparse.ArgumentParser()
@@ -56,7 +54,8 @@ def main():
     dataset = torchvision.datasets.ImageNet(root=args.imagenet_dir, transform=transform, split='val')
     loader = data.DataLoader(dataset, batch_size=args.batch_size, shuffle=False, num_workers=args.loader_workers)
     n_data = len(dataset)
-    i = 0
+    cnt_data = 0
+    cnt_request = 0
     for images, labels in loader:
         images_byte = BytesIO(pickle.dumps(images))
 
@@ -73,22 +72,33 @@ def main():
         n_top1 += np.equal(res['top1_id'], labels).sum()
         n_top5 += np.max(np.isin(res['top5_id'], labels), 1).sum()
 
-        i += len(labels)
-        logger.info(f"BatchSize: {len(labels)}, Progress: {i}/{n_data}, "
+        cnt_data += len(labels)
+        cnt_request += 1
+        logger.info(f"BatchSize: {len(labels)}, Progress: {cnt_data}/{n_data}, "
                     f"InferTime: {res['infer_time']:0.4f}, RespTime: {res['resp_time']:0.4f}")
         # logger.info(f"BatchSize: {len(labels)}, Progress: {i}/{n_data}, "
         #             f"InferTime: {res['infer_time']:0.4f}, RespTime: {res['resp_time']:0.4f}, "
         #             f"Top1: {res['top1_id']}, Top5: {res['top5_id']}")
 
     total_time = timer() - s
-    avg_infer_time = sum(infer_time_list)/len(infer_time_list)
-    avg_resp_time = sum(resp_time_list)/len(resp_time_list)
+    total_infer_time = sum(infer_time_list)
+    total_resp_time = sum(resp_time_list)
     top1_acc = n_top1 / n_data
     top5_acc = n_top5 / n_data
-    logger.info(f"TotalTime: {total_time:0.4f}")
-    logger.info(f"TotalInferTime: {sum(infer_time_list):0.4f}, TotalRespTime: {sum(resp_time_list):0.4f}")
-    logger.info(f"AvgInferTime: {avg_infer_time:0.4f}, AvgRespTime: {avg_resp_time:0.4f}")
-    logger.info(f"Top1Acc: {top1_acc:0.4f}, Top5Acc: {top5_acc:0.4f}")
+    logger.info(f"TotalTime: {total_time:0.5f}")
+    logger.info(f"TotalInferTime: {total_infer_time:0.5f}, "
+                f"TotalRespTime: {total_resp_time:0.5f}")
+    logger.info(f"AvgInferTime_ByData: {total_infer_time / cnt_data:0.5f}, "
+                f"AvgRespTime_ByData: {total_resp_time / cnt_data:0.5f}")
+    logger.info(f"AvgInferTime_ByRequest: {total_infer_time / cnt_request:0.5f}, "
+                f"AvgRespTime_ByRequest: {total_resp_time / cnt_request:0.5f}")
+    logger.info(f"Top1Acc: {top1_acc:0.5f}, Top5Acc: {top5_acc:0.5f}")
+    first_10 = resp_time_list[:10]
+    logger.info(f"First 10 Max Response Time: {max(first_10):0.5f}")
+    logger.info(f"First 10 Avg Response Time: {sum(first_10) / len(first_10):0.5f}")
+    remain = resp_time_list[10:]
+    logger.info(f"Remain Max Response Time: {max(remain):0.5f}")
+    logger.info(f"Remain Avg Response Time: {sum(remain) / len(remain):0.5f}")
 
     for hdlr in logger.handlers:
         hdlr.close()

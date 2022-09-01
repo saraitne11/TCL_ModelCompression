@@ -11,20 +11,21 @@ from timeit import default_timer as timer
 
 
 parser = argparse.ArgumentParser()
+parser.add_argument('--model-repository', type=str,
+                    help="Model Repository(Dir)")
 parser.add_argument('--model', required=True, type=str,
                     help="Model File Name")
 parser.add_argument('--port', required=True, type=int,
                     help="Flask Server Port")
-parser.add_argument('--model_dir', type=str, default='./Models/',
-                    help="Model Repository(Dir)")
 args = parser.parse_args()
 
+
 model_file = args.model if args.model.endswith('.pth') else args.model + '.pth'
-model_dir = args.model_dir if args.model_dir.endswith('/') else args.model_dir + '/'
+model_repository = args.model_repository if args.model_repository.endswith('/') else args.model_repository + '/'
 if 'script' in model_file:
-    model = torch.jit.load(model_dir + model_file)
+    model = torch.jit.load(model_repository + model_file)
 else:
-    model = torch.load(model_dir + model_file)
+    model = torch.load(model_repository + model_file)
 
 with open('imagenet.json', 'r') as f:
     categories = json.loads(f.read())

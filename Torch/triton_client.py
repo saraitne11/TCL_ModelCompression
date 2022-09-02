@@ -155,9 +155,15 @@ def main():
                 f"AvgRespTime_ByData: {total_resp_time / cnt_data:0.5f}")
     logger.info(f"AvgInferTime_ByRequest: {total_infer_time / cnt_request:0.5f}, "
                 f"AvgRespTime_ByRequest: {total_resp_time / cnt_request:0.5f}")
+
+    _sub = resp_time_list[:10]
+    m, a = max(_sub), sum(_sub) / len(_sub)
+    logger.info(f"First 10 [Max, Average] Response Time: [{m:0.5f}, {a:0.5f}]")
+    _sub = resp_time_list[10:]
+    m, a = max(_sub), sum(_sub) / len(_sub)
+    logger.info(f"Remain [Max, Average] Response Time: [{m:0.5f}, {a:0.5f}]")
+
     logger.info(f"Top1Acc: {top1_acc:0.5f}, Top5Acc: {top5_acc:0.5f}")
-    logger.info(f"First 10 Max Response Time: {max(resp_time_list[:10]):0.5f}")
-    logger.info(f"First 10 Avg Response Time: {sum(resp_time_list[:10]) / 10:0.5f}")
 
     for hdlr in logger.handlers:
         hdlr.close()

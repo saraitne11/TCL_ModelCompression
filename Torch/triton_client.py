@@ -101,7 +101,9 @@ def main():
 
     logger.addHandler(handler)
 
-    client = protocol.InferenceServerClient(f'{args.ip}:{args.port}')
+    client = protocol.InferenceServerClient(f'{args.ip}:{args.port}',
+                                            connection_timeout=300,
+                                            network_timeout=300)
     _model, _version = get_ready_model(client)
     transform = torch.load(os.path.join(args.transform_dir, _model + '.pth'))
 

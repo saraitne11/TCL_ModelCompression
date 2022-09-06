@@ -1,7 +1,15 @@
 # Model Compression Evaluation - PyTorch
 
-## R&R
+## 220421 Nvidia AI Developer Meetup Hands-on
+### https://github.com/leejinho610/TRT_Triton_HandsOn
+## Nvidia TensorRT Images
 ### https://catalog.ngc.nvidia.com/orgs/nvidia/containers/tensorrt
+## Torch-TensorRT
+### https://github.com/pytorch/TensorRT#compiling-torch-tensorrt
+
+
+## R&R
+
 TensorRT는 Container 내에서 작업 필수 (Local System 보호)
  - 박용서 M: TensorRT-Desktop
    - torch -> torch_trt (FP32, FP16, INT8)

@@ -18,7 +18,12 @@ from typing import Union, Tuple, List
 def get_ready_model(triton_client: Union[http.InferenceServerClient, grpc.InferenceServerClient]) -> Tuple[str, str]:
     model = ''
     version = ''
-    for m in triton_client.get_model_repository_index():
+    if isinstance(triton_client, http.InferenceServerClient):
+        model_repo = triton_client.get_model_repository_index()
+    else:
+        model_repo = triton_client.get_model_repository_index(as_json=True)['models']
+
+    for m in model_repo:
         if 'state' in m and m['state'] == 'READY':
             model = m['name']
             version = m['version']
@@ -30,10 +35,15 @@ def get_ready_model(triton_client: Union[http.InferenceServerClient, grpc.Infere
 
 def get_model_io_info(triton_client: Union[http.InferenceServerClient, grpc.InferenceServerClient],
                       model: str, version: str, batch_size: str) -> Tuple[str, List[int], str, str]:
-    model_meta = triton_client.get_model_metadata(model, version)
+    if isinstance(triton_client, http.InferenceServerClient):
+        model_meta = triton_client.get_model_metadata(model, version)
+    else:
+        model_meta = triton_client.get_model_metadata(model, version, as_json=True)
+
     input_name = model_meta['inputs'][0]['name']
     input_shape = model_meta['inputs'][0]['shape']
     input_shape[0] = batch_size
+    input_shape = list(map(int, input_shape))
     input_dtype = model_meta['inputs'][0]['datatype']
 
     output_name = model_meta['outputs'][0]['name']
@@ -59,7 +69,7 @@ def get_total_infer_time(ip: str, metrics_port: str, model: str) -> float:
 
 
 def _idx(_s):
-    return int(_s.split(':')[1])
+    return int(_s.decode().split(':')[1])
 
 
 def main():
@@ -101,15 +111,18 @@ def main():
 
     logger.addHandler(handler)
 
-    client = protocol.InferenceServerClient(f'{args.ip}:{args.port}',
-                                            connection_timeout=300,
-                                            network_timeout=300)
+    kwargs = {'url': f'{args.ip}:{args.port}'}
+    if args.protocol.lower() == 'http':
+        kwargs['connection_timeout'] = 300
+        kwargs['network_timeout'] = 300
+    client = protocol.InferenceServerClient(**kwargs)
     _model, _version = get_ready_model(client)
-    transform = torch.load(os.path.join(args.transform_dir, _model + '.pth'))
 
+    transform = torch.load(os.path.join(args.transform_dir, _model + '.pth'))
     input_name, input_shape, input_dtype, output_name = get_model_io_info(client, _model, _version, args.batch_size)
+
     _input = protocol.InferInput(input_name, input_shape, input_dtype)
-    _output = protocol.InferRequestedOutput(output_name, binary_data=False, class_count=5)
+    _output = protocol.InferRequestedOutput(output_name, class_count=5)
 
     s = timer()
     resp_time_list = []

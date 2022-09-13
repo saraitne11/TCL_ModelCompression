@@ -40,6 +40,10 @@ TensorRT는 Container 내에서 작업 필수 (Local System 보호)
 - Python3.6 or later
 - PyTorch 1.10.1
 - torchvision 0.11.2
+- docker 20.10 with nvidia container toolkit
+
+### Nvidia Container toolkit
+- https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#docker
 
 ## Models
 imagenet classification Models from `torchvision 0.11.2` 
@@ -70,7 +74,11 @@ ILSVRC2012 validation images (50,000 image)
 - Build Docker Image
 ```bash
 $ cd TCL_ModelCompression/Torch
+# Desktop
 $ sudo docker build -t flask_app/torch .
+# Jetson nano
+$ sudo docker build -t flask_app/torch \
+--build-arg BASE_IMAGE=nvcr.io/nvidia/l4t-pytorch:r32.7.1-pth1.10-py3 .
 ```
 - Run Flask Server Container
 ```bash

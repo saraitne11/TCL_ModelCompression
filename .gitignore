@@ -5,7 +5,10 @@ nohup.out
 Torch/Flask/Models/
 Torch/Triton/Models/
 Torch/Transforms/
-Torch/torchvision/
+
+Torch/Jetson-nano/Flask/Models/
+Torch/Jetson-nano/Triton/Models/
+Torch/Jetson-nano/Transforms/
 
 __pycache__
 .idea

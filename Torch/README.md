@@ -73,12 +73,13 @@ ILSVRC2012 validation images (50,000 image)
 - if there's no `./Flask/Models/` directory, Run download_xxx_models.ipynb By Jupyter Notebook to download model files.
 - Build Docker Image
 ```bash
-$ cd TCL_ModelCompression/Torch
+$ cd TCL_ModelCompression/Torc
+
 # Desktop
 $ sudo docker build -t flask_app/torch .
+
 # Jetson nano
-$ sudo docker build -t flask_app/torch \
---build-arg BASE_IMAGE=nvcr.io/nvidia/l4t-pytorch:r32.7.1-pth1.10-py3 .
+$ sudo docker build -t flask_app/torch --build-arg BASE_IMAGE=nvcr.io/nvidia/l4t-pytorch:r32.7.1-pth1.10-py3 .
 ```
 - Run Flask Server Container
 ```bash
@@ -88,7 +89,7 @@ $ sudo docker run \
 -p <host port>:<container port> \
 --name <container name> \
 flask_app/torch \
-python flask_server.py --model-repository <flask model repository> \
+python3 flask_server.py --model-repository <flask model repository> \
 --model <.pth file> --port <container port>
 
 # Example
@@ -98,7 +99,7 @@ $ sudo docker run \
 -p 8000:8000 \
 --name flask_app \
 flask_app/torch \
-python flask_server.py --model-repository=/Models \
+python3 flask_server.py --model-repository=/Models \
 --model resnet152-script.pth --port 8000
 ```
 - Check flask_app response

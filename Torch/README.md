@@ -57,7 +57,7 @@ ILSVRC2012 validation images (50,000 image)
 
 ## Model Servings
 - Flask
-- Nvidia Triton (TBD)
+- Nvidia Triton
 
 ## Model Compression
 - TensorRT

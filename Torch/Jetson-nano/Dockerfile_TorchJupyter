@@ -1,3 +1,8 @@
 FROM nvcr.io/nvidia/l4t-pytorch:r32.7.1-pth1.10-py3
+RUN mkdir /workspace
 RUN pip3 install jupyter
+RUN pip3 install torchinfo
+RUN pip3 install scipy
+RUN python3 -m pip install --upgrade pip
+WORKDIR /workspace
 

@@ -9,7 +9,7 @@ sudo docker build -f Dockerfile_TorchJupyter -t torch_jupyter/jetson-nano .
 ```
 sudo docker run -d --gpus all -p <local port>:<container port> -v <local dir>:<container dir> jupyter notebook --ip 0.0.0.0 --port <container port> --allow-root
 # Example
-sudo docker run -d --gpus all -p 8888:8888 -v ~/TCL_ModelCompression:/TCL_ModelCompression --name jupyter_container torch_jupyter/jetson-nano jupyter notebook --allow-root --ip 0.0.0.0 --port 8888 --notebook-dir /TCL_ModelCompression  --no-browser
+sudo docker run -d --gpus all -p 8888:8888 -v ~/TCL_ModelCompression:/TCL_ModelCompression -v ~/ImageNet:/ImageNet --name jupyter_container torch_jupyter/jetson-nano jupyter notebook --allow-root --ip 0.0.0.0 --port 8888 --notebook-dir /TCL_ModelCompression --no-browser
 ```
 
 

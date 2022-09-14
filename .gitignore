@@ -4,13 +4,13 @@
 .Trash*
 
 nohup.out
-Torch/Flask/Models/
-Torch/Triton/Models/
-Torch/Transforms/
+Flask/Models/
+Triton/Models/
+Transforms/
 
-Torch/Jetson-nano/Flask/Models/
-Torch/Jetson-nano/Triton/Models/
-Torch/Jetson-nano/Transforms/
+Jetson-nano/Flask/Models/
+Jetson-nano/Triton/Models/
+Jetson-nano/Transforms/
 
 __pycache__
 .idea

@@ -20,7 +20,7 @@ parser.add_argument('--port', required=True, type=int,
 args = parser.parse_args()
 
 
-model_file = args.model if args.model.endswith('.pth') else args.model + '.pth'
+model_file = args.model if args.model.endswith('.pt') else args.model + '.pt'
 model_repository = args.model_repository if args.model_repository.endswith('/') else args.model_repository + '/'
 if 'script' in model_file:
     model = torch.jit.load(model_repository + model_file)

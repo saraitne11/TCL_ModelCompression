@@ -75,7 +75,7 @@ ILSVRC2012 validation images (50,000 image)
 - Build Docker Image
 ```bash
 $ cd TCL_ModelCompression/
-$ sudo docker build -t flask_app/torch .
+$ sudo docker build -t flask_server/desktop .
 ```
 - Run Flask Server Container
 ```bash
@@ -84,7 +84,7 @@ $ sudo docker run \
 -v <host model dir>:<flask model repository> \
 -p <host port>:<container port> \
 --name <container name> \
-flask_app/torch \
+flask_server/desktop \
 python3 flask_server.py --model-repository <flask model repository> \
 --model <.pth file> --port <container port>
 
@@ -93,28 +93,32 @@ $ sudo docker run \
 --rm --gpus all \
 -v $(pwd)/Flask/Models:/Models \
 -p 8000:8000 \
---name flask_app \
-flask_app/torch \
+--name flask_server \
+flask_server/desktop \
 python3 flask_server.py --model-repository=/Models \
---model resnet152-script.pth --port 8000
+--model resnet34-script.pt --port 8000
 ```
 - Check flask_app response
 ```bash
 $ curl -X GET "http://<ip>:<port>/model"
 # Example
 $ curl -X GET "http://127.0.0.1:8000/model"
-# {"model":"resnet152-script.pth"}
+# {"model":"resnet34-script.pt"}
 ```
 - Check flask_app Process ID using `nvidia-smi`
+- Activate virtualenv
+```bash
+source /home/jangwon/venvs/tcl/bin/activate
+```
 - Run `process_monitor.py` for gpu memory usage of torch model
 ```bash
-$ python ../process_monitor.py --target_pid <pid> --log_file <log_file>
+(tcl)$ python ../process_monitor.py --target_pid <pid> --log_file <log_file>
 # Example
-$ python ../process_monitor.py --target_pid 31888 --log_file Flask/Monitors/resnet152-script-b1.log
+(tcl)$ python ../process_monitor.py --target_pid 31888 --log_file Flask/Monitors/resnet34-script-b1.log
 ```
 - Run `flask_client.py`
 ```bash
-$ python flask_client.py \
+(tcl)$ python flask_client.py \
 --imagenet_dir <dir> \
 --log_file <log_file> \
 --ip <flask_app_ip> \
@@ -122,9 +126,9 @@ $ python flask_client.py \
 --batch_size <batch_size>
 
 # Example
-$ python flask_client.py \
+(tcl)$ python flask_client.py \
 --imagenet_dir /home/data/ImageNet/ \
---log_file Flask/Results/resnet152-script-b1.log \
+--log_file Flask/Results/resnet34-script-b1.log \
 --ip localhost \
 --port 8000 \
 --batch_size 1
@@ -136,7 +140,7 @@ $ python flask_client.py \
 - Check structure of `./Trition/Models/` directory and `config.pbtxt`.
 - Change Directory
 ```bash
-$ cd TCL_ModelCompression/Torch
+$ cd TCL_ModelCompression/
 ```
 - Run Triton Server Container
 ```bash
@@ -159,11 +163,11 @@ $ sudo docker run \
 -p 8000:8000 \
 -p 8001:8001 \
 -p 8002:8002 \
---name triton_app \
+--name triton_server \
 nvcr.io/nvidia/tritonserver:22.08-py3 \
 tritonserver --model-repository=/Models \
 --model-control-mode=explicit \
---load-model=resnet152-script
+--load-model=resnet34-script
 ```
 - Check triton app response
 ```bash
@@ -173,15 +177,19 @@ $ curl -X GET "http://localhost:8002/metrics"
 # Triton Metric Text...
 ```
 - Check flask_app Process ID using `nvidia-smi`
+- Activate virtualenv
+```bash
+source /home/jangwon/venvs/tcl/bin/activate
+```
 - Run `process_monitor.py` for gpu memory usage of torch model
 ```bash
-$ python ../process_monitor.py --target_pid <pid> --log_file <log_file>
+(tcl)$ python ../process_monitor.py --target_pid <pid> --log_file <log_file>
 # Example
-$ python ../process_monitor.py --target_pid 31888 --log_file Triton/Monitors/resnet152-script-http-b1.log
+(tcl)$ python ../process_monitor.py --target_pid 31888 --log_file Triton/Monitors/resnet34-script-http-b1.log
 ```
 - Run `triton_client.py`
 ```bash
-$ python triton_client.py \
+(tcl)$ python triton_client.py \
 --imagenet_dir <dir> \
 --log_file <log_file> \
 --ip <triton_app_ip> \
@@ -190,9 +198,9 @@ $ python triton_client.py \
 --batch_size <batch_size>
 
 # Example
-$ python triton_client.py \
+(tcl)$ python triton_client.py \
 --imagenet_dir /home/data/ImageNet/ \
---log_file Triton/Results/resnet152-script-http-b1.log \
+--log_file Triton/Results/resnet34-script-http-b1.log \
 --ip localhost \
 --port 8000 \
 --protocol http \

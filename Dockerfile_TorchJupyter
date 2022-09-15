@@ -1,7 +1,7 @@
-FROM nvcr.io/nvidia/l4t-pytorch:r32.7.1-pth1.10-py3
-RUN mkdir /workspace
+FROM pytorch/pytorch:1.10.0-cuda11.3-cudnn8-devel
 RUN pip3 install jupyter
 RUN pip3 install torchinfo
 RUN pip3 install scipy
+RUN pip3 install onnxruntime-gpu
 RUN python3 -m pip install --upgrade pip
 WORKDIR /workspace

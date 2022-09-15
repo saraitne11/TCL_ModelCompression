@@ -15,19 +15,19 @@ from io import BytesIO
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--imagenet_dir', required=True, type=str,
+    parser.add_argument('--imagenet-dir', required=True, type=str,
                         help="ImageNet Validation Data Directory")
-    parser.add_argument('--log_file', required=True, type=str,
+    parser.add_argument('--log-file', required=True, type=str,
                         help="Target Log File")
     parser.add_argument('--ip', required=True, type=str,
                         help="Target flask server ip")
     parser.add_argument('--port', required=True, type=str,
                         help="Target flask server port")
-    parser.add_argument('--batch_size', type=int, default=1,
+    parser.add_argument('--batch-size', type=int, default=1,
                         help="Batch Size")
-    parser.add_argument('--transform_dir', type=str, default='./Transforms/',
+    parser.add_argument('--transform-dir', type=str, default='./Transforms/',
                         help="Transform file directory")
-    parser.add_argument('--loader_workers', type=int, default=2,
+    parser.add_argument('--loader-workers', type=int, default=0,
                         help="DataLoader Workers")
     args = parser.parse_args()
 

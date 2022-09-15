@@ -1,14 +1,10 @@
-# Model Compression Evaluation - PyTorch
+# Model Compression Evaluation
 
 # 참고 자료
-- 220421 Nvidia AI Developer Meetup Hands-on
-  - https://github.com/leejinho610/TRT_Triton_HandsOn
-- Nvidia TensorRT Images
-  - https://catalog.ngc.nvidia.com/orgs/nvidia/containers/tensorrt
-- Torch-TensorRT
-  - https://github.com/pytorch/TensorRT#compiling-torch-tensorrt
-- Nvidia Triton Server
-  - https://github.com/triton-inference-server/server/tree/main/docs
+- <a href=https://github.com/leejinho610/TRT_Triton_HandsOn>220421 Nvidia AI Developer Meetup Hands-on</a>
+- <a href=https://catalog.ngc.nvidia.com/orgs/nvidia/containers/tensorrt>Nvidia TensorRT Images</a>
+- <a href=https://github.com/pytorch/TensorRT#compiling-torch-tensorrt>Torch-TensorRT</a>
+- <a href=https://github.com/triton-inference-server/server/tree/main/docs>Nvidia Triton Server</a>
 
 ## R&R
 
@@ -42,11 +38,10 @@ TensorRT는 Container 내에서 작업 필수 (Local System 보호)
 - Python3.6 or later
 - PyTorch 1.10.1
 - torchvision 0.11.2
-- docker 20.10 with nvidia container toolkit
-  - https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#docker
+- docker 20.10 with <a href=https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#docker>nvidia container toolkit</a>
 
 ## Models
-imagenet classification Models from `torchvision 0.11.2` (https://pytorch.org/vision/0.11/models.html) 
+<a href=https://pytorch.org/vision/0.11/models.html>imagenet classification Models</a> from `torchvision 0.11.2` 
 - torchvision.models.resnet34
 - torchvision.models.mobilenet_v2
 - torchvision.models.efficientnet_b0
@@ -57,7 +52,7 @@ ILSVRC2012 validation images (50,000 image)
 
 ## Devices
 - AMD 3990X ThreadRipper / Nvidia RTX 3090 24GB / RAM 128GB
-- Nvidia Jetson Nano 4GB
+- <a href=https://github.com/saraitne11/TCL_ModelCompression/tree/main/Jetson-nano>Nvidia Jetson Nano 4GB</a>
 
 ## Model Servings
 - Flask
@@ -69,72 +64,163 @@ ILSVRC2012 validation images (50,000 image)
 - Pruning
 - Quantization
 
-### Flask Serving
-- Before Run Triton Model Serving, Check `./Flask/Models/` directory.
-- if there's no `./Flask/Models/` directory, Run download_xxx_models.ipynb By Jupyter Notebook to download model files.
-- Build Docker Image
+### Build Docker Images
+- Torch Jupyter
 ```bash
 $ cd TCL_ModelCompression/
-$ sudo docker build -t flask_server/desktop .
+$ sudo docker build -f Dockerfile_TorchJupyter -t torch_jupyter/desktop .
 ```
-- Run Flask Server Container
+- Flask Server
 ```bash
+$ cd TCL_ModelCompression/
+$ sudo docker build -f Dockerfile_FlaskServer -t flask_server/desktop .
+```
+- Flask Client
+```bash
+$ cd TCL_ModelCompression/
+$ sudo docker build -f Dockerfile_FlaskClient -t flask_client/desktop .
+```
+
+### Download Model Files & Model Local Test
+- Create docker container.
+- When write command in multiple lines with "\\", there should be no characters after "\\". 
+```bash
+$ cd TCL_ModelCompression/
+
+$ sudo docker run \ 
+-d --gpus all \
+-p <host port>:<container port> \
+-v <host dir>:<container dir> \
+--name torch_jupyter \
+--shm-size 4G \
+torch_jupyter/desktop \
+jupyter notebook --allow-root \
+--ip 0.0.0.0 --port <container port> \
+--notebook-dir <notebook home dir> --no-browser
+
+# Example
+$ sudo docker run \
+-d --gpus all \
+-p 8881:8881 \
+-v $(pwd):/TCL_ModelCompression \
+-v /home/data/ImageNet:/ImageNet \
+--name torch_jupyter \
+--shm-size 4G \
+torch_jupyter/desktop \
+jupyter notebook --allow-root \
+--ip 0.0.0.0 --port 8881 \
+--notebook-dir /TCL_ModelCompression --no-browser
+```
+
+- `--shm-size 4G` means shared memory with host of container. You can check using `df -h` command in container.
+```
+Filesystem      Size  Used Avail Use% Mounted on
+overlay         457G  276G  158G  64% /
+tmpfs            64M     0   64M   0% /dev
+shm             4.0G     0  4.0G   0% /dev/shm
+/dev/nvme0n1p3  457G  276G  158G  64% /ImageNet
+tmpfs            63G   12K   63G   1% /proc/driver/nvidia
+udev             63G     0   63G   0% /dev/nvidia0
+tmpfs            63G     0   63G   0% /proc/asound
+tmpfs            63G     0   63G   0% /proc/acpi
+tmpfs            63G     0   63G   0% /proc/scsi
+tmpfs            63G     0   63G   0% /sys/firmware
+```
+
+- Check jupyter notebook URL & Token.
+```bash
+$ sudo docker exec torch_jupyter jupyter notebook list
+```
+- Open jupyter notebook and Run model file download codes.
+  - `download_script_models.ipybn`
+  - `download_onnx_models.ipybn`
+- Run jupyter notebook codes in `ModelTest/` directory.
+
+
+### Flask Serving For Desktop(RTX 3090)
+- Before run triton model serving, Check `./Flask/Models/` directory.
+- Create flask server container.
+```bash
+$ cd TCL_ModelCompression/
+
 $ sudo docker run \
 --rm --gpus all \
--v <host model dir>:<flask model repository> \
 -p <host port>:<container port> \
+-v <host model dir>:<flask model repository> \
 --name <container name> \
 flask_server/desktop \
-python3 flask_server.py --model-repository <flask model repository> \
+python3 flask_server.py \
+--model-repository <flask model repository> \
 --model <.pth file> --port <container port>
 
 # Example
 $ sudo docker run \
 --rm --gpus all \
--v $(pwd)/Flask/Models:/Models \
 -p 8000:8000 \
+-v $(pwd)/Flask/Models:/Models \
 --name flask_server \
 flask_server/desktop \
-python3 flask_server.py --model-repository=/Models \
+python3 flask_server.py \
+--model-repository=/Models \
 --model resnet34-script.pt --port 8000
 ```
-- Check flask_app response
+- Check flask_app response.
 ```bash
 $ curl -X GET "http://<ip>:<port>/model"
 # Example
 $ curl -X GET "http://127.0.0.1:8000/model"
 # {"model":"resnet34-script.pt"}
 ```
-- Check flask_app Process ID using `nvidia-smi`
-- Activate virtualenv
+- Check flask_server.py Process ID using `nvidia-smi`.
+- Run `process_monitor.py` for monitoring gpu memory usage of torch model.
 ```bash
-source /home/jangwon/venvs/tcl/bin/activate
-```
-- Run `process_monitor.py` for gpu memory usage of torch model
-```bash
-(tcl)$ python ../process_monitor.py --target_pid <pid> --log_file <log_file>
+$ cd TCL_ModelCompression
+$ sudo python process_monitor.py --target-pid <pid> --log-file <log_file>
 # Example
-(tcl)$ python ../process_monitor.py --target_pid 31888 --log_file Flask/Monitors/resnet34-script-b1.log
+$ sudo python process_monitor.py --target-pid 31888 --log-file Flask/Monitors/resnet34-script-b1.log
 ```
-- Run `flask_client.py`
+- Create flask_client container and Run `flask_client.py`.
+```
+sudo docker run --rm --gpus all -v $(pwd):/Jetson-nano -v ~/ImageNet:/ImageNet --name flask_client flask_client/jetson-nano python3 flask_client.py --imagenet-dir /ImageNet --log-file /Jetson-nano/Flask/Results/resnet34-script-b1.log --ip 10.250.72.83 --port 8000 --batch-size 1 --transform-dir /Jetson-nano/Transforms --loader-workers 0
+```
 ```bash
-(tcl)$ python flask_client.py \
---imagenet_dir <dir> \
---log_file <log_file> \
---ip <flask_app_ip> \
---port <flask_app_port> \
---batch_size <batch_size>
+$ cd TCL_ModelCompression/
+
+$ sudo docker run \
+--rm --gpus all \
+-v <host repository>:<container repository> \
+-v <host imagenet dir>:<container imagenet dir> \
+--name flask_client \
+--shm-size 4G \
+flask_client/desktop \
+python3 flask_client.py \
+--imagenet-dir <container imagenet dir> \
+--log-file <client logfile path> \
+--ip <host ip address, not localhost or 127.0.0.1> \
+--port <flask server container port> \
+--batch-size 1 \
+--transform-dir <transform file dir> \
+--loader-workers 2
 
 # Example
-(tcl)$ python flask_client.py \
---imagenet_dir /home/data/ImageNet/ \
---log_file Flask/Results/resnet34-script-b1.log \
---ip localhost \
+$ sudo docker run \
+--rm --gpus all \
+-v $(pwd):/TCL_ModelCompression \
+-v /home/data/ImageNet:/ImageNet \
+--name flask_client \
+--shm-size 4G \
+flask_client/desktop \
+python3 flask_client.py \
+--imagenet-dir /ImageNet \
+--log-file /TCL_ModelCompression/Flask/Results/resnet34-script-b1.log \
+--ip 10.250.73.32 \
 --port 8000 \
---batch_size 1
+--batch-size 1 \
+--transform-dir /TCL_ModelCompression/Transforms \
+--loader-workers 2
 ```
 
-### Nvidia Triton Serving
+### Nvidia Triton Serving For Desktop(RTX 3090)
 - Before Run Triton Model Serving, Check `./Triton/Models/` directory.
 - if there's no `./Triton/Models/` directory, Run download_xxx_models.ipynb By Jupyter Notebook to download model files.
 - Check structure of `./Trition/Models/` directory and `config.pbtxt`.

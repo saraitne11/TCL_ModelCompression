@@ -47,15 +47,15 @@ def get_gpu_proc_info(_pid: int) -> Tuple[str, int]:
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--target_pid', required=True, type=int,
+    parser.add_argument('--target-pid', required=True, type=int,
                         help="Logging Target Process ID")
-    parser.add_argument('--log_file', required=True, type=str,
+    parser.add_argument('--log-file', required=True, type=str,
                         help="Target Log File")
-    parser.add_argument('--log_period', type=int, default=1,
+    parser.add_argument('--log-period', type=int, default=1,
                         help="Logging Period (Second), Default=1")
-    parser.add_argument('--log_file_size', type=int, default=10,
+    parser.add_argument('--log-file-size', type=int, default=10,
                         help="Target Log File Rotating Size (MiB), Default=10")
-    parser.add_argument('--log_file_count', type=int, default=5,
+    parser.add_argument('--log-file-count', type=int, default=5,
                         help="Target Log File Backup Count, Default=5")
     args = parser.parse_args()
 

@@ -1,12 +1,14 @@
 # Model Compression Evaluation - PyTorch
 
-## 220421 Nvidia AI Developer Meetup Hands-on
-### https://github.com/leejinho610/TRT_Triton_HandsOn
-## Nvidia TensorRT Images
-### https://catalog.ngc.nvidia.com/orgs/nvidia/containers/tensorrt
-## Torch-TensorRT
-### https://github.com/pytorch/TensorRT#compiling-torch-tensorrt
-
+# 참고 자료
+- 220421 Nvidia AI Developer Meetup Hands-on
+  - https://github.com/leejinho610/TRT_Triton_HandsOn
+- Nvidia TensorRT Images
+  - https://catalog.ngc.nvidia.com/orgs/nvidia/containers/tensorrt
+- Torch-TensorRT
+  - https://github.com/pytorch/TensorRT#compiling-torch-tensorrt
+- Nvidia Triton Server
+  - https://github.com/triton-inference-server/server/tree/main/docs
 
 ## R&R
 
@@ -41,16 +43,14 @@ TensorRT는 Container 내에서 작업 필수 (Local System 보호)
 - PyTorch 1.10.1
 - torchvision 0.11.2
 - docker 20.10 with nvidia container toolkit
-
-### Nvidia Container toolkit
-- https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#docker
+  - https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#docker
 
 ## Models
-imagenet classification Models from `torchvision 0.11.2` 
-- torchvision.models.resnet152
-- torchvision.models.densenet201
-- torchvision.models.efficientnet_b7
+imagenet classification Models from `torchvision 0.11.2` (https://pytorch.org/vision/0.11/models.html) 
+- torchvision.models.resnet34
 - torchvision.models.mobilenet_v2
+- torchvision.models.efficientnet_b0
+- torchvision.models.efficientnet_b7
 
 ## Data
 ILSVRC2012 validation images (50,000 image) 
@@ -65,6 +65,7 @@ ILSVRC2012 validation images (50,000 image)
 
 ## Model Compression
 - TensorRT
+- Torch-TensorRT
 - Pruning
 - Quantization
 
@@ -73,13 +74,8 @@ ILSVRC2012 validation images (50,000 image)
 - if there's no `./Flask/Models/` directory, Run download_xxx_models.ipynb By Jupyter Notebook to download model files.
 - Build Docker Image
 ```bash
-$ cd TCL_ModelCompression/Torc
-
-# Desktop
+$ cd TCL_ModelCompression/
 $ sudo docker build -t flask_app/torch .
-
-# Jetson nano
-$ sudo docker build -t flask_app/torch --build-arg BASE_IMAGE=nvcr.io/nvidia/l4t-pytorch:r32.7.1-pth1.10-py3 .
 ```
 - Run Flask Server Container
 ```bash

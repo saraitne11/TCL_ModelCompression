@@ -64,6 +64,7 @@ ILSVRC2012 validation images (50,000 image)
 - Pruning
 - Quantization
 
+
 ### Build Docker Images
 - Torch Jupyter
 ```bash
@@ -80,6 +81,12 @@ $ sudo docker build -f Dockerfile_FlaskServer -t flask_server/desktop .
 $ cd TCL_ModelCompression/
 $ sudo docker build -f Dockerfile_FlaskClient -t flask_client/desktop .
 ```
+- Tirton Client
+```bash
+$ cd TCL_ModelCompression/
+$ sudo docker build -f Dockerfile_TritonClient -t triton_client/desktop .
+```
+
 
 ### Download Model Files & Model Local Test
 - Create docker container.
@@ -164,14 +171,14 @@ python3 flask_server.py \
 --model-repository=/Models \
 --model resnet34-script.pt --port 8000
 ```
-- Check flask_app response.
+- Check flask server response.
 ```bash
 $ curl -X GET "http://<ip>:<port>/model"
 # Example
 $ curl -X GET "http://127.0.0.1:8000/model"
 # {"model":"resnet34-script.pt"}
 ```
-- Check flask_server.py Process ID using `nvidia-smi`.
+- Check `flask_server.py` PID using `nvidia-smi`.
 - Run `process_monitor.py` for monitoring gpu memory usage of torch model.
 ```bash
 $ cd TCL_ModelCompression
@@ -195,12 +202,12 @@ $ sudo docker run \
 flask_client/desktop \
 python3 flask_client.py \
 --imagenet-dir <container imagenet dir> \
---log-file <client logfile path> \
+--log-file <client log file path> \
 --ip <host ip address, not localhost or 127.0.0.1> \
---port <flask server container port> \
---batch-size 1 \
+--port <flask server port> \
+--batch-size <batch size> \
 --transform-dir <transform file dir> \
---loader-workers 2
+--loader-workers <loader workers>
 
 # Example
 $ sudo docker run \
@@ -222,23 +229,22 @@ python3 flask_client.py \
 
 ### Nvidia Triton Serving For Desktop(RTX 3090)
 - Before Run Triton Model Serving, Check `./Triton/Models/` directory.
-- if there's no `./Triton/Models/` directory, Run download_xxx_models.ipynb By Jupyter Notebook to download model files.
 - Check structure of `./Trition/Models/` directory and `config.pbtxt`.
-- Change Directory
+
+- Create triton server container.
 ```bash
 $ cd TCL_ModelCompression/
-```
-- Run Triton Server Container
-```bash
+
 $ sudo docker run \
 --rm --gpus all \
 -v <host model dir>:<triton model repository> \
 -p <host port1>:<trtion HTTP port> \
 -p <host port2>:<trtion gRPC port> \
 -p <host port3>:<trtion Metrics port> \
---name <container name>
+--name <container name> \
 nvcr.io/nvidia/tritonserver:22.08-py3 \
-tritonserver --model-repository=<triton model repository> \
+tritonserver \
+--model-repository=<triton model repository> \
 --model-control-mode=explicit \
 --load-model=<model_name>
 
@@ -251,44 +257,61 @@ $ sudo docker run \
 -p 8002:8002 \
 --name triton_server \
 nvcr.io/nvidia/tritonserver:22.08-py3 \
-tritonserver --model-repository=/Models \
+tritonserver \
+--model-repository=/Models \
 --model-control-mode=explicit \
 --load-model=resnet34-script
 ```
-- Check triton app response
+- Check triton server response
 ```bash
 $ curl -X GET "http://<ip>:<port>/metrics"
 # Example
 $ curl -X GET "http://localhost:8002/metrics"
 # Triton Metric Text...
 ```
-- Check flask_app Process ID using `nvidia-smi`
-- Activate virtualenv
+- Check `triton_server` PID using `nvidia-smi`.
+- Run `process_monitor.py` for monitoring gpu memory usage of torch model.
 ```bash
-source /home/jangwon/venvs/tcl/bin/activate
-```
-- Run `process_monitor.py` for gpu memory usage of torch model
-```bash
-(tcl)$ python ../process_monitor.py --target_pid <pid> --log_file <log_file>
+$ sudo python process_monitor.py --target_pid <pid> --log_file <log_file>
 # Example
-(tcl)$ python ../process_monitor.py --target_pid 31888 --log_file Triton/Monitors/resnet34-script-http-b1.log
+$ sudo python process_monitor.py --target_pid 31888 --log_file Triton/Monitors/resnet34-script-http-b1.log
 ```
-- Run `triton_client.py`
+- Create triton_client container and Run `triton_client.py`.
 ```bash
-(tcl)$ python triton_client.py \
---imagenet_dir <dir> \
---log_file <log_file> \
---ip <triton_app_ip> \
---port <triton_app http/grpc port> \
---protocol <http/grpc> \
---batch_size <batch_size>
+$ cd TCL_ModelCompression/
 
-# Example
-(tcl)$ python triton_client.py \
---imagenet_dir /home/data/ImageNet/ \
---log_file Triton/Results/resnet34-script-http-b1.log \
---ip localhost \
+$ sudo docker run \
+--rm --gpus all \
+-v $(pwd):/TCL_ModelCompression \
+-v /home/data/ImageNet:/ImageNet \
+--name triton_client \
+--shm-size 4G \
+triton_client/desktop \
+python3 triton_client.py \
+--imagenet-dir /ImageNet \
+--log-file /TCL_ModelCompression/Triton/Results/resnet34-script-http-b1.log \
+--ip 10.250.73.32 \
 --port 8000 \
 --protocol http \
---batch_size 1
+--batch-size 1 \
+--transform-dir /TCL_ModelCompression/Transforms \
+--loader-workers 2
+
+# Example
+$ sudo docker run \
+--rm --gpus all \
+-v <host repository>:<container repository> \
+-v <host imagenet dir>:<container imagenet dir> \
+--name triton_client \
+--shm-size 4G \
+triton_client/desktop \
+python3 triton_client.py \
+--imagenet-dir <container imagenet dir> \
+--log-file <client log file path> \
+--ip <host ip address, not localhost or 127.0.0.1> \
+--port <triton server port> \
+--protocol <http or grpc> \
+--batch-size <batch size> \
+--transform-dir <transform file dir> \
+--loader-workers <loader workers>
 ```

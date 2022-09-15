@@ -118,7 +118,7 @@ def main():
     client = protocol.InferenceServerClient(**kwargs)
     _model, _version = get_ready_model(client)
 
-    transform = torch.load(os.path.join(args.transform_dir, _model + '.pth'))
+    transform = torch.load(os.path.join(args.transform_dir, _model + '.pt'))
     input_name, input_shape, input_dtype, output_name = get_model_io_info(client, _model, _version, args.batch_size)
 
     _input = protocol.InferInput(input_name, input_shape, input_dtype)

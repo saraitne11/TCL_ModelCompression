@@ -27,9 +27,6 @@ if 'script' in model_file:
 else:
     model = torch.load(model_repository + model_file)
 
-with open('imagenet.json', 'r') as f:
-    categories = json.loads(f.read())
-
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 model = model.to(device)
 model = model.eval()
@@ -55,19 +52,13 @@ def inference():
 
     _, top1 = output.max(1)
     top1_id = top1.tolist()
-    # top1_name = list(map(lambda _id: categories[_id], top1_id))
 
     _, top5 = output.topk(5, 1, True, True)
     top5_id = top5.tolist()
-    # top5_name = []
-    # for b in top5_id:
-    #     top5_name.append(list(map(lambda _id: categories[_id], b)))
 
     res = {
         'top1_id': top1_id,
-        # 'top1_name': top1_name,
         'top5_id': top5_id,
-        # 'top5_name': top5_name,
         'infer_time': infer_time
     }
     return jsonify(res)

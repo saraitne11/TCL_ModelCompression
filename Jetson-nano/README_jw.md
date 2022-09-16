@@ -97,9 +97,9 @@ $ curl -X GET "http://127.0.0.1:8000/model"
 - Run `jtop_monitor.py` for monitoring gpu memory usage of torch model.
 ```bash
 $ cd TCL_ModelCompression/Jetson-nano/
-$ sudo python jtop_monitor.py --log-file <log_file>
+$ sudo python3 jtop_monitor.py --log-file <log_file>
 # Example
-$ sudo python jtop_monitor.py --log-file Flask/Monitors/resnet34-script-b1.log
+$ sudo python3 jtop_monitor.py --log-file Flask/Monitors/resnet34-script-b1.log
 ```
 - Create flask_client container and Run `flask_client.py`.
 ```bash

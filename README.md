@@ -6,7 +6,7 @@
 - <a href=https://github.com/pytorch/TensorRT#compiling-torch-tensorrt>Torch-TensorRT</a>
 - <a href=https://github.com/triton-inference-server/server/tree/main/docs>Nvidia Triton Server Github</a>
 - <a href=https://catalog.ngc.nvidia.com/orgs/nvidia/containers/tritonserver>Nvidia Triton Server NGC(Nvidia Gpu Cloud)</a>
-
+- <a href=https://github.com/NVIDIA/TensorRT/blob/main/quickstart/SemanticSegmentation/tutorial-runtime.ipynb>TensorRT Inference in Python</a>
 
 ## R&R
 
@@ -73,6 +73,11 @@ ILSVRC2012 validation images (50,000 image)
 $ cd TCL_ModelCompression/
 $ sudo docker build -f Dockerfile_TorchJupyter -t torch_jupyter/desktop .
 ```
+- TensorRT Jupyter
+```bash
+$ cd TCL_ModelCompression/
+$ sudo docker build -f Dockerfile_TensorRTJupyter -t tensorrt_jupyter/desktop .
+```
 - Flask Server
 ```bash
 $ cd TCL_ModelCompression/
@@ -131,7 +136,7 @@ $ sudo docker run \
 -v /home/data/ImageNet:/ImageNet \
 --name tensorrt_jupyter \
 --shm-size 4G \
-nvcr.io/nvidia/pytorch:22.08-py3 \
+tensorrt_jupyter/desktop \
 jupyter notebook --allow-root \
 --ip 0.0.0.0 --port 8881 \
 --notebook-dir /TCL_ModelCompression --no-browser

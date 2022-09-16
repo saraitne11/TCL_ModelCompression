@@ -1,0 +1,4 @@
+FROM nvcr.io/nvidia/pytorch:22.08-py3
+RUN pip3 install pycuda
+RUN python3 -m pip install --upgrade pip
+WORKDIR /workspace

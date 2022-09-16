@@ -44,7 +44,8 @@ def main():
 
     resp = requests.get(url=f'http://{args.ip}:{args.port}/model')
     model_file = resp.json()['model']
-    transform = torch.load(os.path.join(args.transform_dir, model_file))
+    base_model = model_file.split('-')[0]
+    transform = torch.load(os.path.join(args.transform_dir, base_model + '.pt'))
 
     s = timer()
     infer_time_list = []

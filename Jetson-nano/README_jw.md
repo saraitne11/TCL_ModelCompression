@@ -44,7 +44,7 @@ $ sudo docker run \
 -v $(pwd):/TCL_ModelCompression \
 -v ~/ImageNet:/ImageNet \
 --name torch_jupyter \
-torch_jupyter/desktop \
+torch_jupyter/jetson-nano \
 jupyter notebook --allow-root \
 --ip 0.0.0.0 --port 8881 \
 --notebook-dir /TCL_ModelCompression --no-browser

@@ -55,10 +55,10 @@ def main():
             if logging_time < cur_time:
                 d = jetson.ram
                 cpu_mem = (d['use'] - d['shared']) * 10 ** 3    # CPU Memory (Byte)
-                cpu_mem = cpu_mem / 2 ** 20                     # CPU Memory (MiB)
+                cpu_mem = int(cpu_mem / 2 ** 20)                # CPU Memory (MiB)
 
                 gpu_mem = d['shared'] * 10 ** 3                 # GPU Memory (Byte)
-                gpu_mem = gpu_mem / 2 ** 20                     # GPU Memory (MiB
+                gpu_mem = int(gpu_mem / 2 ** 20)                # GPU Memory (MiB)
 
                 logger.info(f"Memory: {cpu_mem} MiB, GPU Memory: {gpu_mem} MiB")
                 logging_time = cur_time + args.log_period

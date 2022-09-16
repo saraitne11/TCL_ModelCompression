@@ -93,19 +93,20 @@ $ sudo docker build -f Dockerfile_TritonClient -t triton_client/desktop .
 - When write command in multiple lines with "\\", there should be no characters after "\\". 
 ```bash
 $ cd TCL_ModelCompression/
-
 $ sudo docker run \ 
 -d --gpus all \
 -p <host port>:<container port> \
 -v <host dir>:<container dir> \
 --name torch_jupyter \
 --shm-size 4G \
-torch_jupyter/desktop \
+<docker image> \
 jupyter notebook --allow-root \
 --ip 0.0.0.0 --port <container port> \
 --notebook-dir <notebook home dir> --no-browser
-
-# Example
+```
+```bash
+# For Script, ONNX model file
+$ cd TCL_ModelCompression/
 $ sudo docker run \
 -d --gpus all \
 -p 8881:8881 \
@@ -114,6 +115,21 @@ $ sudo docker run \
 --name torch_jupyter \
 --shm-size 4G \
 torch_jupyter/desktop \
+jupyter notebook --allow-root \
+--ip 0.0.0.0 --port 8881 \
+--notebook-dir /TCL_ModelCompression --no-browser
+```
+```bash
+# For TensorRT model file
+$ cd TCL_ModelCompression/
+$ sudo docker run \
+-d --gpus all \
+-p 8881:8881 \
+-v $(pwd):/TCL_ModelCompression \
+-v /home/data/ImageNet:/ImageNet \
+--name tensorrt_jupyter \
+--shm-size 4G \
+nvcr.io/nvidia/pytorch:22.08-py3 \
 jupyter notebook --allow-root \
 --ip 0.0.0.0 --port 8881 \
 --notebook-dir /TCL_ModelCompression --no-browser
@@ -136,7 +152,7 @@ tmpfs            63G     0   63G   0% /sys/firmware
 
 - Check jupyter notebook URL & Token.
 ```bash
-$ sudo docker exec torch_jupyter jupyter notebook list
+$ sudo docker exec [torch_jupyter|tensorrt_jupyter] jupyter notebook list
 ```
 - Open jupyter notebook and Run model file download codes.
   - `download_script_models.ipybn`
@@ -144,8 +160,8 @@ $ sudo docker exec torch_jupyter jupyter notebook list
 - Run jupyter notebook codes in `ModelTest/` directory.
 
 
-### Flask Serving For Desktop(RTX 3090)
-- Before run triton model serving, Check `./Flask/Models/` directory.
+### Flask Serving For Desktop (RTX 3090)
+- Before run triton model serving, Check `TCL_ModelCompression/Flask/Models/` directory.
 - Create flask server container.
 ```bash
 $ cd TCL_ModelCompression/
@@ -181,15 +197,12 @@ $ curl -X GET "http://127.0.0.1:8000/model"
 - Check `flask_server.py` PID using `nvidia-smi`.
 - Run `process_monitor.py` for monitoring gpu memory usage of torch model.
 ```bash
-$ cd TCL_ModelCompression
+$ cd TCL_ModelCompression/
 $ sudo python process_monitor.py --target-pid <pid> --log-file <log_file>
 # Example
 $ sudo python process_monitor.py --target-pid 31888 --log-file Flask/Monitors/resnet34-script-b1.log
 ```
 - Create flask_client container and Run `flask_client.py`.
-```
-sudo docker run --rm --gpus all -v $(pwd):/Jetson-nano -v ~/ImageNet:/ImageNet --name flask_client flask_client/jetson-nano python3 flask_client.py --imagenet-dir /ImageNet --log-file /Jetson-nano/Flask/Results/resnet34-script-b1.log --ip 10.250.72.83 --port 8000 --batch-size 1 --transform-dir /Jetson-nano/Transforms --loader-workers 0
-```
 ```bash
 $ cd TCL_ModelCompression/
 
@@ -203,7 +216,7 @@ flask_client/desktop \
 python3 <container repository>/flask_client.py \
 --imagenet-dir <container imagenet dir> \
 --log-file <client log file path> \
---ip <host ip address, not localhost or 127.0.0.1> \
+--ip <host ip address> \
 --port <flask server port> \
 --batch-size <batch size> \
 --transform-dir <transform file dir> \
@@ -227,9 +240,9 @@ python3 /TCL_ModelCompression/flask_client.py \
 --loader-workers 2
 ```
 
-### Nvidia Triton Serving For Desktop(RTX 3090)
-- Before Run Triton Model Serving, Check `./Triton/Models/` directory.
-- Check structure of `./Trition/Models/` directory and `config.pbtxt`.
+### Nvidia Triton Serving For Desktop (RTX 3090)
+- Before Run Triton Model Serving, Check `TCL_ModelCompression/Triton/Models/` directory.
+- Check structure of `TCL_ModelCompression/Trition/Models/` directory and `config.pbtxt`.
 
 - Create triton server container.
 ```bash
@@ -272,9 +285,9 @@ $ curl -X GET "http://localhost:8002/metrics"
 - Check `triton_server` PID using `nvidia-smi`.
 - Run `process_monitor.py` for monitoring gpu memory usage of torch model.
 ```bash
-$ sudo python process_monitor.py --target-pid <pid> --log-file <log file>
+$ sudo python jtop_monitor.py --target-pid <pid> --log-file <log file>
 # Example
-$ sudo python process_monitor.py --target-pid 31888 --log-file Triton/Monitors/resnet34-script-http-b1.log
+$ sudo python jtop_monitor.py --target-pid 31888 --log-file Triton/Monitors/resnet34-script-http-b1.log
 ```
 - Create triton_client container and Run `triton_client.py`.
 ```bash
@@ -290,7 +303,7 @@ triton_client/desktop \
 python3 <container repo home>/triton_client.py \
 --imagenet-dir <container imagenet dir> \
 --log-file <client log file path> \
---ip <host ip address, not localhost or 127.0.0.1> \
+--ip <host ip address> \
 --port <triton server port> \
 --protocol <http or grpc> \
 --batch-size <batch size> \

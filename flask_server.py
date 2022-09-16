@@ -6,7 +6,6 @@ from flask import jsonify
 
 import argparse
 import pickle
-import json
 from timeit import default_timer as timer
 
 

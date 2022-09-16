@@ -1,6 +1,4 @@
 FROM nvcr.io/nvidia/l4t-pytorch:r32.7.1-pth1.10-py3
 RUN mkdir /app
-COPY ../flask_server.py /app
-COPY ../imagenet.json /app
 RUN pip3 install flask
 WORKDIR /app

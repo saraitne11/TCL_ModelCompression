@@ -1,4 +1,25 @@
-## Jetson nano Docker Images
+### Build Docker Images
+- Torch Jupyter
+```bash
+$ cd TCL_ModelCompression/
+$ sudo docker build -f Jetson-nano/Dockerfile_TorchJupyter -t torch_jupyter/jetson-nano .
+```
+- Flask Server
+```bash
+$ cd TCL_ModelCompression/
+$ sudo docker build -f Jetson-nano/Dockerfile_FlaskServer -t flask_server/jetson-nano .
+```
+- Flask Client
+```bash
+$ cd TCL_ModelCompression/
+$ sudo docker build -f Jetson-nano/Dockerfile_FlaskClient -t flask_client/jetson-nano .
+```
+- Tirton Client
+```bash
+$ cd TCL_ModelCompression/
+$ sudo docker build -f Jetson-nano/Dockerfile_TritonClient -t triton_client/jetson-nano .
+```
+
 
 ### Torch-Jupyter
 - Build Image

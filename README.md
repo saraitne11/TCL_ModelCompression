@@ -205,9 +205,9 @@ $ curl -X GET "http://127.0.0.1:8000/model"
 - Run `process_monitor.py` for monitoring gpu memory usage of torch model.
 ```bash
 $ cd TCL_ModelCompression/
-$ sudo python process_monitor.py --target-pid <pid> --log-file <log_file>
+$ sudo python3 process_monitor.py --target-pid <pid> --log-file <log_file>
 # Example
-$ sudo python process_monitor.py --target-pid 31888 --log-file Flask/Monitors/resnet34-script-b1.log
+$ sudo python3 process_monitor.py --target-pid 31888 --log-file Flask/Monitors/resnet34-script-b1.log
 ```
 - Create flask_client container and Run `flask_client.py`.
 ```bash
@@ -292,9 +292,10 @@ $ curl -X GET "http://localhost:8002/metrics"
 - Check `triton_server` PID using `nvidia-smi`.
 - Run `process_monitor.py` for monitoring gpu memory usage of torch model.
 ```bash
-$ sudo python jtop_monitor.py --target-pid <pid> --log-file <log file>
+$ cd TCL_ModelCompression/
+$ sudo python3 process_monitor.py --target-pid <pid> --log-file <log file>
 # Example
-$ sudo python jtop_monitor.py --target-pid 31888 --log-file Triton/Monitors/resnet34-script-http-b1.log
+$ sudo python3 process_monitor.py --target-pid 31888 --log-file Triton/Monitors/resnet34-script-http-b1.log
 ```
 - Create triton_client container and Run `triton_client.py`.
 ```bash

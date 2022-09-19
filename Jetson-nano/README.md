@@ -5,44 +5,36 @@
  - tensorrt and cudnn8.2.1
  - sdk 6.0
 
+## 2. running docker with tenssort, pytorch etc
 
-## 2. running docker with tensorrt imported
-```bash
-$ sudo docker run -it --net=host --runtime nvidia -e DISPLAY=$DISPLAY -v /tmp/.X11-unix/:/tmp/.X11-unix nvcr.io/nvidia/l4t-tensorrt:r8.0.1-runtime
-```
+ - local folder : /home/skbluemumin/Downloads/imagenet_tar_folder
+ - docker folder : /root/temp (auto mkdir)
 
-### a. install pytorch, vision
 ```bash
-pip3 install torch==1.10.1 torchvision==0.11.2 torchaudio==0.10.1 -f https://download.pytorch.org/whl/torch_stable.html
+$ docker run -it --gpus all --net=host --runtime nvidia -e DISPLAY=$DISPLAY -v /home/skbluemumin/Downloads/imagenet_tar_folder:/root/temp dustynv/jetson-inference:r32.7.1
 ```
-(cf. issue with pip3 install jupyter >> using vscode py file and debugging)
 
 ```
 python3 --version
-# 3.8.0
+# 3.6.9
 ```
 
-> python3
+'''
+pip3 install jupyter
+'''
+
+> jupyter notebook --ip='*' --port=8888 --allow-root
+
 ```python
 >>> import tensorrt
 >>> tensorrt.__version__
-'8.0.1.6'
+'8.2.1.8'
 >>> PyTorch 
-1.10.1
+1.10.0
 >>> torchvision 
-0.11.2
+0.11.0
 ```
 
-```bash
-$ docker commit [current_container] imagenet-test:0.21
-```
-
-## 3. docker with imagenet validation connect
- - local folder : /home/skbluemumin/Downloads/imagenet_tar_folder
- - docker folder : /root/temp (auto mkdir)
-```bash
-docker run -it --net=host --runtime nvidia -e DISPLAY=$DISPLAY -v /home/skbluemumin/Downloads/imagenet_tar_folder:/root/temp imagenet-test:0.21
-```
 
 > python3 
 
@@ -50,14 +42,14 @@ docker run -it --net=host --runtime nvidia -e DISPLAY=$DISPLAY -v /home/skbluemu
  - test complete
 
 #### b. download_base_models.ipynb
- - test partially complete (not connecting cuda:0?)
+ - test complete
 
 ### c. pytorch > tensorrt test
- - not yet
+ - test complete (default setting) - efficinetnet v0 only
+
+ - with [torch2trt](https://github.com/NVIDIA-AI-IOT/torch2trt)
+
+ - torch_tensorrt not installed
 
 ### d. pytorch > onmx > tensorrt test
  - not yet
-
-
-## Install Pytorch, Torchvision using pip (virtualenv)
- - https://forums.developer.nvidia.com/t/pytorch-for-jetson-version-1-11-now-available/72048

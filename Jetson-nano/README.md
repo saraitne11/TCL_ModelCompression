@@ -1,3 +1,9 @@
+cf) [triton 관련 속도 개선 요약 테크 블로그 내용](https://tech.kakaopay.com/post/model-serving-framework/)
+
+작업 추천 방식 : ipynb 파일 대신, python3 실행 방식 추천
+
+-> ipynb를 쓰기 위해서 jupyter를 키면, 모델 하나만 올려도 jetson_nano가 멈춤
+
 ## 1. jetpack 4.6.1 base setting
  - Docker version 20.10.7
  - ubuntu18.04
@@ -9,6 +15,14 @@
 
  - local folder : /home/skbluemumin/Downloads/imagenet_tar_folder
  - docker folder : /root/temp (auto mkdir)
+
+```
+AS-IS : pytorch + tensorrt + gpu 지원이 동시에 가능하였어야 하나 gpu 인식이 안됨
+
+TO-BE : [pytorch 블로그](https://pytorch.org/blog/running-pytorch-models-on-jetson-nano/)에서 신규 이미지 파일 다운로드
+'''
+
+<br/>
 
 ```bash
 $ docker run -it --gpus all --net=host --runtime nvidia -e DISPLAY=$DISPLAY -v /home/skbluemumin/Downloads/imagenet_tar_folder:/root/temp dustynv/jetson-inference:r32.7.1
@@ -51,5 +65,13 @@ pip3 install jupyter
 
  - torch_tensorrt not installed
 
+ - fp16, int8 관련 [블로그] (https://nvidia-ai-iot.github.io/torch2trt/v0.2.0/usage/reduced_precision.html)
+
+ -> jetson nano가 int8을 지원하지 않음
+
+ cf) [in8 관련 문의](https://forums.developer.nvidia.com/t/why-jetson-nano-not-support-int8/84060/2)
+
 ### d. pytorch > onmx > tensorrt test
  - not yet
+
+ - onnx 변환 관련 [github](https://github.com/NVIDIA/TensorRT/blob/master/quickstart/IntroNotebooks/4.%20Using%20PyTorch%20through%20ONNX.ipynb)

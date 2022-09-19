@@ -328,10 +328,10 @@ $ sudo docker run \
 triton_client/desktop \
 python3 /TCL_ModelCompression/triton_client.py \
 --imagenet-dir /ImageNet \
---log-file /TCL_ModelCompression/Triton/Results/resnet34-script-http-b1.log \
+--log-file /TCL_ModelCompression/Triton/Results/resnet34-script-grpc-b1.log \
 --ip 10.250.73.32 \
---port 8000 \
---protocol http \
+--port 8001 \
+--protocol grpc \
 --batch-size 1 \
 --transform-dir /TCL_ModelCompression/Transforms \
 --loader-workers 2

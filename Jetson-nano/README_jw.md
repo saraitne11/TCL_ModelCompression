@@ -96,10 +96,10 @@ $ curl -X GET "http://127.0.0.1:8000/model"
 ```
 - Run `jtop_monitor.py` for monitoring gpu memory usage of torch model.
 ```bash
-$ cd TCL_ModelCompression/
+$ cd TCL_ModelCompression/Jetson-nano
 $ sudo python3 jtop_monitor.py --log-file <log_file>
 # Example
-$ sudo python3 jtop_monitor.py --log-file Jetson-nano/Flask/Monitors/resnet34-script-b1.log
+$ sudo python3 jtop_monitor.py --log-file Flask/Monitors/resnet34-script-b1.log
 ```
 - Create flask_client container and Run `flask_client.py`.
 ```bash
@@ -183,10 +183,10 @@ $ curl -X GET "http://localhost:8002/metrics"
 
 - Run `jtop_monitor.py` for monitoring gpu memory usage of torch model.
 ```bash
-$ cd TCL_ModelCompression/
+$ cd TCL_ModelCompression/Jetson-nano
 $ sudo python3 jtop_monitor.py --target-pid <pid> --log-file <log file>
 # Example
-$ sudo python3 jtop_monitor.py --log-file Jetson-nano/Triton/Monitors/resnet34-script-http-b1.log
+$ sudo python3 jtop_monitor.py --log-file Triton/Monitors/resnet34-script-grpc-b1.log
 ```
 - Create triton_client container and Run `triton_client.py`.
 ```bash
@@ -217,10 +217,10 @@ $ sudo docker run \
 triton_client/jetson-nano \
 python3 /TCL_ModelCompression/triton_client.py \
 --imagenet-dir /ImageNet \
---log-file /TCL_ModelCompression/Jetson-nano/Triton/Results/resnet34-script-http-b1.log \
+--log-file /TCL_ModelCompression/Jetson-nano/Triton/Results/resnet34-script-grpc-b1.log \
 --ip 10.250.72.83 \
---port 8000 \
---protocol http \
+--port 8001 \
+--protocol grpc \
 --batch-size 1 \
 --transform-dir /TCL_ModelCompression/Jetson-nano/Transforms \
 --loader-workers 0

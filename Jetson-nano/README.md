@@ -1,3 +1,9 @@
+cf) [triton 관련 속도 개선 요약 테크 블로그 내용](https://tech.kakaopay.com/post/model-serving-framework/)
+
+작업 추천 방식 : ipynb 파일 대신, python3 실행 방식 추천
+
+-> ipynb를 쓰기 위해서 jupyter를 키면, 모델 하나만 올려도 jetson_nano가 멈춤
+
 ## 1. jetpack 4.6.1 base setting
  - Docker version 20.10.7
  - ubuntu18.04
@@ -5,44 +11,44 @@
  - tensorrt and cudnn8.2.1
  - sdk 6.0
 
+## 2. running docker with tenssort, pytorch etc
 
-## 2. running docker with tensorrt imported
-```bash
-$ sudo docker run -it --net=host --runtime nvidia -e DISPLAY=$DISPLAY -v /tmp/.X11-unix/:/tmp/.X11-unix nvcr.io/nvidia/l4t-tensorrt:r8.0.1-runtime
-```
+ - local folder : /home/skbluemumin/Downloads/imagenet_tar_folder
+ - docker folder : /root/temp (auto mkdir)
 
-### a. install pytorch, vision
-```bash
-pip3 install torch==1.10.1 torchvision==0.11.2 torchaudio==0.10.1 -f https://download.pytorch.org/whl/torch_stable.html
 ```
-(cf. issue with pip3 install jupyter >> using vscode py file and debugging)
+AS-IS : pytorch + tensorrt + gpu 지원이 동시에 가능하였어야 하나 gpu 인식이 안됨
+
+TO-BE : [pytorch 블로그](https://pytorch.org/blog/running-pytorch-models-on-jetson-nano/)에서 신규 이미지 파일 다운로드
+'''
+
+<br/>
+
+```bash
+$ docker run -it --gpus all --net=host --runtime nvidia -e DISPLAY=$DISPLAY -v /home/skbluemumin/Downloads/imagenet_tar_folder:/root/temp dustynv/jetson-inference:r32.7.1
+```
 
 ```
 python3 --version
-# 3.8.0
+# 3.6.9
 ```
 
-> python3
+'''
+pip3 install jupyter
+'''
+
+> jupyter notebook --ip='*' --port=8888 --allow-root
+
 ```python
 >>> import tensorrt
 >>> tensorrt.__version__
-'8.0.1.6'
+'8.2.1.8'
 >>> PyTorch 
-1.10.1
+1.10.0
 >>> torchvision 
-0.11.2
+0.11.0
 ```
 
-```bash
-$ docker commit [current_container] imagenet-test:0.21
-```
-
-## 3. docker with imagenet validation connect
- - local folder : /home/skbluemumin/Downloads/imagenet_tar_folder
- - docker folder : /root/temp (auto mkdir)
-```bash
-docker run -it --net=host --runtime nvidia -e DISPLAY=$DISPLAY -v /home/skbluemumin/Downloads/imagenet_tar_folder:/root/temp imagenet-test:0.21
-```
 
 > python3 
 
@@ -50,14 +56,22 @@ docker run -it --net=host --runtime nvidia -e DISPLAY=$DISPLAY -v /home/skbluemu
  - test complete
 
 #### b. download_base_models.ipynb
- - test partially complete (not connecting cuda:0?)
+ - test complete
 
 ### c. pytorch > tensorrt test
- - not yet
+ - test complete (default setting) - efficinetnet v0 only
+
+ - with [torch2trt](https://github.com/NVIDIA-AI-IOT/torch2trt)
+
+ - torch_tensorrt not installed
+
+ - fp16, int8 관련 [블로그] (https://nvidia-ai-iot.github.io/torch2trt/v0.2.0/usage/reduced_precision.html)
+
+ -> jetson nano가 int8을 지원하지 않음
+
+ cf) [in8 관련 문의](https://forums.developer.nvidia.com/t/why-jetson-nano-not-support-int8/84060/2)
 
 ### d. pytorch > onmx > tensorrt test
  - not yet
 
-
-## Install Pytorch, Torchvision using pip (virtualenv)
- - https://forums.developer.nvidia.com/t/pytorch-for-jetson-version-1-11-now-available/72048
+ - onnx 변환 관련 [github](https://github.com/NVIDIA/TensorRT/blob/master/quickstart/IntroNotebooks/4.%20Using%20PyTorch%20through%20ONNX.ipynb)

@@ -18,12 +18,9 @@ TensorRT는 Container 내에서 작업 필수 (Local System 보호)
      - densenet201-onnx_trt_fp16.plan
 
 
-- 김경록 M: TensorRT-JetsonNano
-  - torch -> torch_trt (FP32, FP16, INT8)
-    - densenet201-jn-torch_trt_fp16.pth
-  - torch -> onnx -> onnx_trt (FP32, FP16, INT8)
+- 김경록 M: TensorRT-JetsonNano (INT8 미 지원, torch-trt -> triton 미 지원)
+  - torch -> onnx -> onnx_trt (FP32, FP16)
     - densenet201-jn-onnx_trt_fp16.plan
-
 
 - 김경록 M: Pruning
   - densenet201-pruning.pth

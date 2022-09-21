@@ -16,11 +16,11 @@ cf) [triton 관련 속도 개선 요약 테크 블로그 내용](https://tech.ka
  - local folder : /home/skbluemumin/Downloads/imagenet_tar_folder
  - docker folder : /root/temp (auto mkdir)
 
-```
+
 AS-IS : pytorch + tensorrt + gpu 지원이 동시에 가능하였어야 하나 gpu 인식이 안됨
 
 TO-BE : [pytorch 블로그](https://pytorch.org/blog/running-pytorch-models-on-jetson-nano/)에서 신규 이미지 파일 다운로드
-'''
+
 
 <br/>
 
@@ -33,9 +33,9 @@ python3 --version
 # 3.6.9
 ```
 
-'''
-pip3 install jupyter
-'''
+
+> pip3 install jupyter
+
 
 > jupyter notebook --ip='*' --port=8888 --allow-root
 
@@ -49,8 +49,15 @@ pip3 install jupyter
 0.11.0
 ```
 
+```bash
+tensorrt 변환시 int8 수행 문제
 
-> python3 
+ - fp16, int8 관련 [블로그](https://nvidia-ai-iot.github.io/torch2trt/v0.2.0/usage/reduced_precision.html)
+
+ -> jetson nano가 int8을 지원하지 않음
+
+  cf) [in8 관련 문의](https://forums.developer.nvidia.com/t/why-jetson-nano-not-support-int8/84060/2)
+```
 
 ### a. imagenet_validset_read_test.ipynb content
  - test complete
@@ -58,20 +65,21 @@ pip3 install jupyter
 #### b. download_base_models.ipynb
  - test complete
 
-### c. pytorch > tensorrt test
+#### c. download_onnx_models.ipynb
+
+ - test complete
+
+ - efficientnet_b7은 수행시 메모리 문제로 파일이 나오지 않음(해결 방법 확인 중)
+
+### d. pytorch > tensorrt test
  - test complete (default setting) - efficinetnet v0 only
 
- - with [torch2trt](https://github.com/NVIDIA-AI-IOT/torch2trt)
+ - torch_tensorrt not installed / with [torch2trt](https://github.com/NVIDIA-AI-IOT/torch2trt)
 
- - torch_tensorrt not installed
+ -> triton에서 torch_trt가 안되므로 시간이 되면 수행
 
- - fp16, int8 관련 [블로그] (https://nvidia-ai-iot.github.io/torch2trt/v0.2.0/usage/reduced_precision.html)
-
- -> jetson nano가 int8을 지원하지 않음
-
- cf) [in8 관련 문의](https://forums.developer.nvidia.com/t/why-jetson-nano-not-support-int8/84060/2)
-
-### d. pytorch > onmx > tensorrt test
- - not yet
+### e. pytorch > onmx > tensorrt test
 
  - onnx 변환 관련 [github](https://github.com/NVIDIA/TensorRT/blob/master/quickstart/IntroNotebooks/4.%20Using%20PyTorch%20through%20ONNX.ipynb)
+
+ - download_onnx_tensorrt_models.ipynb 수행

@@ -110,8 +110,8 @@ jupyter notebook --allow-root \
 --ip 0.0.0.0 --port <container port> \
 --notebook-dir <notebook home dir> --no-browser
 ```
+- For Script, ONNX model file
 ```bash
-# For Script, ONNX model file
 $ cd TCL_ModelCompression/
 $ sudo docker run \
 -d --gpus all \
@@ -125,8 +125,8 @@ jupyter notebook --allow-root \
 --ip 0.0.0.0 --port 8881 \
 --notebook-dir /TCL_ModelCompression --no-browser
 ```
+- For TensorRT model file
 ```bash
-# For TensorRT model file
 $ cd TCL_ModelCompression/
 $ sudo docker run \
 -d --gpus all \
@@ -161,8 +161,9 @@ tmpfs            63G     0   63G   0% /sys/firmware
 $ sudo docker exec [torch_jupyter|tensorrt_jupyter] jupyter notebook list
 ```
 - Open jupyter notebook and Run model file download codes.
-  - `download_script_models.ipybn`
-  - `download_onnx_models.ipybn`
+  - `download_script_models.ipynb`
+  - `download_onnx_models.ipynb`
+  - `download_onnx_tenssorrt_models.ipynb`
 - Run jupyter notebook codes in `ModelTest/` directory.
 
 
@@ -294,7 +295,7 @@ $ curl -X GET "http://localhost:8002/metrics"
 $ cd TCL_ModelCompression/
 $ sudo python3 process_monitor.py --target-pid <pid> --log-file <log file>
 # Example
-$ sudo python3 process_monitor.py --target-pid 31888 --log-file Triton/Monitors/resnet34-script-http-b1.log
+$ sudo python3 process_monitor.py --target-pid 31888 --log-file Triton/Monitors/resnet34-script-grpc-b1.log
 ```
 - Create triton_client container and Run `triton_client.py`.
 ```bash

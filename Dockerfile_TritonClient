@@ -1,6 +1,4 @@
 FROM pytorch/pytorch:1.10.0-cuda11.3-cudnn8-devel
 RUN mkdir /app
-RUN pip3 install tritonclient[all]
-RUN pip3 install requests
-RUN pip3 install scipy
+RUN pip3 install requests scipy tritonclient[all]
 WORKDIR /app

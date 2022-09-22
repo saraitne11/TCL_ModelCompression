@@ -43,13 +43,34 @@ if '-script' in args.model:
         top5_id = top5.tolist()
         return top5_id
 
+elif '-onnx' in args.model:
+    import onnxruntime
+
+    model_file = args.model if args.model.endswith('.onnx') else args.model + '.onnx'
+    ort_sess = onnxruntime.InferenceSession(model_repository + model_file,
+                                            providers=['CUDAExecutionProvider'])
+    _input = ort_sess.get_inputs()[0].name
+    _output = ort_sess.get_outputs()[0].name
+
+    def infer(x):
+        output = ort_sess.run([_output], {_input: x.numpy()})
+        output = output[0]
+        return output
+
+    def get_top1_id(output):
+        top1_id = output.argmax(1).tolist()
+        return top1_id
+
+    def get_top5_id(output):
+        top5_id = output.argsort(1)[:, ::-1][:, :5].tolist()
+        return top5_id
+
 elif '-trt' in args.model:
     import pycuda.driver as cuda
     import pycuda.autoinit
     import tensorrt as trt
 
     model_file = args.model if args.model.endswith('.plan') else args.model + '.plan'
-
     TRT_LOGGER = trt.Logger()
     trt_runtime = trt.Runtime(TRT_LOGGER)
     with open(model_repository + model_file, 'rb') as f:

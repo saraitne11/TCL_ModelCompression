@@ -1,5 +1,4 @@
 FROM nvcr.io/nvidia/pytorch:22.08-py3
 RUN mkdir /app
-RUN pip3 install pycuda
-RUN pip3 install flask
+RUN pip3 install flask onnxruntime-gpu pycuda
 WORKDIR /app

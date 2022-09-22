@@ -2,9 +2,11 @@
 
 ## 참고 자료
 - <a href=https://github.com/leejinho610/TRT_Triton_HandsOn>220421 Nvidia AI Developer Meetup Hands-on</a>
-- <a href=https://catalog.ngc.nvidia.com/orgs/nvidia/containers/tensorrt>Nvidia TensorRT Images</a>
+- <a href=https://catalog.ngc.nvidia.com/orgs/nvidia/containers/tensorrt>Nvidia TensorRT Docker Images</a>
+- <a href=https://catalog.ngc.nvidia.com/orgs/nvidia/containers/l4t-tensorrt>Nvidia TenosrRT Docker Images for Jetson</a>
 - <a href=https://github.com/pytorch/TensorRT#compiling-torch-tensorrt>Torch-TensorRT</a>
 - <a href=https://github.com/triton-inference-server/server/tree/main/docs>Nvidia Triton Server Github</a>
+- <a href=https://github.com/triton-inference-server/server/releases>Nvidia Triton Server Realese Note</a>
 - <a href=https://catalog.ngc.nvidia.com/orgs/nvidia/containers/tritonserver>Nvidia Triton Server NGC(Nvidia Gpu Cloud)</a>
 - <a href=https://github.com/NVIDIA/TensorRT/blob/main/quickstart/SemanticSegmentation/tutorial-runtime.ipynb>TensorRT Inference in Python</a>
 

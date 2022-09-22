@@ -1,6 +1,4 @@
 FROM nvcr.io/nvidia/l4t-pytorch:r32.7.1-pth1.10-py3
 RUN mkdir /app
-RUN pip3 install tritonclient[all]
-RUN pip3 install requests
-RUN pip3 install scipy
+RUN pip3 install requests scipy tritonclient[all]
 WORKDIR /app

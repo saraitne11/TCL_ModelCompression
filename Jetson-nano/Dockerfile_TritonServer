@@ -1,0 +1,5 @@
+FROM nvcr.io/nvidia/l4t-pytorch:r32.7.1-pth1.10-py3
+RUN mkdir /app
+RUN apt-get update -y && apt-get install -y libre2-dev libb64-dev
+ADD tritonserver2.19.0-jetpack4.6.1.tgz /app
+WORKDIR /app

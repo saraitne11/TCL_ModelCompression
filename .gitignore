@@ -11,6 +11,8 @@ Transforms/
 Jetson-nano/Flask/Models/
 Jetson-nano/Triton/Models/
 Jetson-nano/Transforms/
+Jetson-nano/tritonserver2.19.0-jetpack4.6.1.tgz
+Jetson-nano/onnxruntime_gpu-1.11.0-cp36-cp36m-linux_aarch64.whl
 
 __pycache__
 .idea

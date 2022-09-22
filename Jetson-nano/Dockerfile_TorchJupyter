@@ -1,7 +1,10 @@
 FROM nvcr.io/nvidia/l4t-pytorch:r32.7.1-pth1.10-py3
+
 RUN mkdir /workspace
-RUN pip3 install jupyter
-RUN pip3 install torchinfo
-RUN pip3 install scipy
+RUN pip3 install jupyter torchinfo scipy protobuf==3.19.4
+
+ADD ./Jetson-nano/onnxruntime_gpu-1.11.0-cp36-cp36m-linux_aarch64.whl /workspace
+RUN pip3 install /workspace/onnxruntime_gpu-1.11.0-cp36-cp36m-linux_aarch64.whl
+
 RUN python3 -m pip install --upgrade pip
 WORKDIR /workspace

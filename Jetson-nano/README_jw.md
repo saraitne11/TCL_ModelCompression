@@ -1,3 +1,16 @@
+## Environments
+ - NVIDIA Jetson Nano 4GB
+ - Jetpack 4.6.2
+
+### Downloads
+```bash
+$ cd TCL_ModelCompression/Jetson-nano
+# Triton Inference Server Executable Codes
+$ wget https://github.com/triton-inference-server/server/releases/download/v2.19.0/tritonserver2.19.0-jetpack4.6.1.tgz
+# Onnxruntime wheel file
+$ wget https://nvidia.box.com/shared/static/pmsqsiaw4pg9qrbeckcbymho6c01jj4z.whl -O onnxruntime_gpu-1.11.0-cp36-cp36m-linux_aarch64.whl
+```
+
 ### Build Docker Images
 - Torch Jupyter
 ```bash
@@ -13,6 +26,11 @@ $ sudo docker build -f Jetson-nano/Dockerfile_FlaskServer -t flask_server/jetson
 ```bash
 $ cd TCL_ModelCompression/
 $ sudo docker build -f Jetson-nano/Dockerfile_FlaskClient -t flask_client/jetson-nano .
+```
+- Flask Server
+```bash
+$ cd TCL_ModelCompression/
+$ sudo docker build -f Jetson-nano/Dockerfile_TritonServer -t triton_server/jetson-nano .
 ```
 - Tirton Client
 ```bash
@@ -35,8 +53,8 @@ jupyter notebook --allow-root \
 --ip 0.0.0.0 --port <container port> \
 --notebook-dir <notebook home dir> --no-browser
 ```
+- For Script, ONNX model file
 ```bash
-# For Script, ONNX model file
 $ cd TCL_ModelCompression/
 $ sudo docker run \
 -d --gpus all \
@@ -49,14 +67,21 @@ jupyter notebook --allow-root \
 --ip 0.0.0.0 --port 8881 \
 --notebook-dir /TCL_ModelCompression --no-browser
 ```
+- For TensorRT model file
+```bash
+$ cd TCL_ModelCompression/
+$ nohup sudo ~/.local/bin/jupyter notebook --allow-root --ip 0.0.0.0 --port 8881 --no-browser &
+```
 
 - Check jupyter notebook URL & Token.
 ```bash
 $ sudo docker exec torch_jupyter jupyter notebook list
+$ jupyter notebook list
 ```
 - Open jupyter notebook and Run model file download codes.
-  - `download_script_models.ipybn`
-  - `download_onnx_models.ipybn`
+  - `download_script_models.ipynb`
+  - `download_onnx_models.ipynb`
+  - `download_onnx_tensorrt_models.ipynb`
 - Run jupyter notebook codes in `ModelTest/` directory.
 
 
@@ -141,7 +166,6 @@ python3 /TCL_ModelCompression/flask_client.py \
 - Before Run Triton Model Serving, Check `TCL_ModelCompression/Jetson-nano/Triton/Models/` directory.
 - Check structure of `TCL_ModelCompression/Jetson-nano/Trition/Models/` directory and `config.pbtxt`.
 
-
 - Create triton server container.
 ```bash
 $ cd TCL_ModelCompression/
@@ -153,9 +177,10 @@ $ sudo docker run \
 -p <host port2>:<trtion gRPC port> \
 -p <host port3>:<trtion Metrics port> \
 --name <container name> \
-nvcr.io/nvidia/tritonserver:22.08-py3 \
-tritonserver \
+triton_server/jetson-nano \
+/app/bin/tritonserver \
 --model-repository=<triton model repository> \
+--backend-dir=<trtiton beckend lib dir>
 --model-control-mode=explicit \
 --load-model=<model_name>
 
@@ -167,9 +192,10 @@ $ sudo docker run \
 -p 8001:8001 \
 -p 8002:8002 \
 --name triton_server \
-nvcr.io/nvidia/tritonserver:22.08-py3 \
-tritonserver \
+triton_server/jetson-nano \
+/app/bin/tritonserver \
 --model-repository=/Models \
+--backend-directory=/app/backends \
 --model-control-mode=explicit \
 --load-model=resnet34-script
 ```

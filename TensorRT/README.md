@@ -57,6 +57,11 @@ $ jupyter notebook --allow-root -ip. 0.0.0.0 -port 8888
 
 * 2개 파일 실행
 * `(주의사항) : Torch_TensorRT Model의 FP16, INT8은 네트워크상의 문제가 있어서 추가 확인후 공유 예정(resnet34_fp16은 다운 가능, 이외 모델들은 불가능)`
+* Onnx TensorRT Precision option(best, noTf32, fp16, int8) - Precision을 옵션을 통하여 추론속도 및 메모리 효율 향상 가능
+* --best : FP32 + FP16 + INT8의 혼합정밀도
+* --noTF32 : FP32 기반
+* --fp16 : FP16 기반
+* --int8 : INT8 기반
 
 #### Model Respository 구조 
 * Titon

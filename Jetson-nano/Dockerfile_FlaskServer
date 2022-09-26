@@ -1,6 +1,6 @@
 FROM nvcr.io/nvidia/l4t-pytorch:r32.7.1-pth1.10-py3
 RUN mkdir /app
-RUN pip3 install flask
+RUN pip3 install flask protobuf==3.19.4
 
 ADD ./Jetson-nano/onnxruntime_gpu-1.11.0-cp36-cp36m-linux_aarch64.whl /app
 RUN pip3 install /app/onnxruntime_gpu-1.11.0-cp36-cp36m-linux_aarch64.whl

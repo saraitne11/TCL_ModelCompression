@@ -27,7 +27,7 @@ $ sudo docker build -f Jetson-nano/Dockerfile_FlaskServer -t flask_server/jetson
 $ cd TCL_ModelCompression/
 $ sudo docker build -f Jetson-nano/Dockerfile_FlaskClient -t flask_client/jetson-nano .
 ```
-- Flask Server
+- Triton Server
 ```bash
 $ cd TCL_ModelCompression/
 $ sudo docker build -f Jetson-nano/Dockerfile_TritonServer -t triton_server/jetson-nano .

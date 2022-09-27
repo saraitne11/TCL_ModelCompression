@@ -27,6 +27,8 @@ TensorRT는 Container 내에서 작업 필수 (Local System 보호)
 - 김경록 M: Pruning
   - densenet201-pruning.pth
 
+-> [pytorch pruning 관련 속도 문제](https://computing-jhson.tistory.com/42)
+
 
 - 이장원 M: Triton Client 개발
 - 이장원 M: Desktop 실험 (Flask)

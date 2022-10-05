@@ -109,6 +109,7 @@ def main():
     total_resp_time = sum(resp_time_list)
     top1_acc = n_top1 / args.image_max_count
     top5_acc = n_top5 / args.image_max_count
+    logger.info(f"Image Size: {args.image_size}")
     logger.info(f"TotalTime: {total_time:0.5f}")
     logger.info(f"TotalInferTime: {total_infer_time:0.5f}, "
                 f"TotalRespTime: {total_resp_time:0.5f}")

@@ -74,6 +74,8 @@ def main():
     ## input 개수랑 size 여기서 수정/ for문 수정
     for images, labels in loader:
         if max_cnt<args.image_max_count:
+            max_cnt=max_cnt+1
+
             # images == resize() --> torch_resize()
             transform =torchvision.transforms.Resize(args.image_size)
             images_resize=transform(images)
@@ -100,7 +102,7 @@ def main():
             #             f"InferTime: {res['infer_time']:0.4f}, RespTime: {res['resp_time']:0.4f}, "
             #             f"Top1: {res['top1_id']}, Top5: {res['top5_id']}")
         else :
-            max_cnt=max_cnt+1
+            break
             
     total_time = timer() - s
     total_infer_time = sum(infer_time_list)

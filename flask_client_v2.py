@@ -96,7 +96,7 @@ def main():
 
             cnt_data += len(labels)
             cnt_request += 1
-            logger.info(f"BatchSize: {len(labels)}, Progress: {cnt_data}/{n_data}, "
+            logger.info(f"BatchSize: {len(labels)}, Progress: {cnt_data}/{args.image_max_count}, "
                         f"InferTime: {res['infer_time']:0.4f}, RespTime: {res['resp_time']:0.4f}")
             # logger.info(f"BatchSize: {len(labels)}, Progress: {i}/{n_data}, "
             #             f"InferTime: {res['infer_time']:0.4f}, RespTime: {res['resp_time']:0.4f}, "
@@ -107,8 +107,8 @@ def main():
     total_time = timer() - s
     total_infer_time = sum(infer_time_list)
     total_resp_time = sum(resp_time_list)
-    top1_acc = n_top1 / n_data
-    top5_acc = n_top5 / n_data
+    top1_acc = n_top1 / args.image_max_count
+    top5_acc = n_top5 / args.image_max_count
     logger.info(f"TotalTime: {total_time:0.5f}")
     logger.info(f"TotalInferTime: {total_infer_time:0.5f}, "
                 f"TotalRespTime: {total_resp_time:0.5f}")

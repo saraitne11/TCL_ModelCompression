@@ -174,7 +174,7 @@ def main():
 
             cnt_data += len(labels)
             cnt_request += 1
-            logger.info(f"BatchSize: {len(labels)}, Progress: {cnt_data}/{n_data}, "
+            logger.info(f"BatchSize: {len(labels)}, Progress: {cnt_data}/{args.image_max_count}, "
                         f"RespTime: {resp_time:0.4f}")
         else :
             break

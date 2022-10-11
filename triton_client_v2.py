@@ -156,8 +156,8 @@ def main():
             
             transform =torchvision.transforms.Resize(args.image_size)
             images_resize=transform(images)
-                
-            _input.set_data_from_numpy(images.numpy())
+
+            _input.set_data_from_numpy(images_resize.numpy())
 
             ss = timer()
             resp = client.infer(model_name=_model, model_version='1',

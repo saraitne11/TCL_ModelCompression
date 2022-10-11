@@ -153,8 +153,12 @@ def main():
             if len(labels) != args.batch_size:
                 input_shape[0] = len(labels)
                 _input = protocol.InferInput(input_name, input_shape, input_dtype)
-
+            
+            transform =torchvision.transforms.Resize(args.image_size)
+            images_resize=transform(images)
+                
             _input.set_data_from_numpy(images.numpy())
+
             ss = timer()
             resp = client.infer(model_name=_model, model_version='1',
                                 inputs=[_input], outputs=[_output])

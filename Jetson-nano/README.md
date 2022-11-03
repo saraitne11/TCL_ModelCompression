@@ -1,85 +1,253 @@
-cf) [triton 관련 속도 개선 요약 테크 블로그 내용](https://tech.kakaopay.com/post/model-serving-framework/)
+## Environments
+ - NVIDIA Jetson Nano 4GB
+ - Jetpack 4.6.2
 
-작업 추천 방식 : ipynb 파일 대신, python3 실행 방식 추천
-
--> ipynb를 쓰기 위해서 jupyter를 키면, 모델 하나만 올려도 jetson_nano가 멈춤
-
-## 1. jetpack 4.6.1 base setting
- - Docker version 20.10.7
- - ubuntu18.04
- - cuda10.2
- - tensorrt and cudnn8.2.1
- - sdk 6.0
-
-## 2. running docker with tenssort, pytorch etc
-
- - local folder : /home/skbluemumin/Downloads/imagenet_tar_folder
- - docker folder : /root/temp (auto mkdir)
-
-
-AS-IS : pytorch + tensorrt + gpu 지원이 동시에 가능하였어야 하나 gpu 인식이 안됨
-
-TO-BE : [pytorch 블로그](https://pytorch.org/blog/running-pytorch-models-on-jetson-nano/)에서 신규 이미지 파일 다운로드
-
-
-<br/>
-
+### Downloads
 ```bash
-$ docker run -it --gpus all --net=host --runtime nvidia -e DISPLAY=$DISPLAY -v /home/skbluemumin/Downloads/imagenet_tar_folder:/root/temp dustynv/jetson-inference:r32.7.1
+$ cd TCL_ModelCompression/Jetson-nano
+# Triton Inference Server Executable Codes
+$ wget https://github.com/triton-inference-server/server/releases/download/v2.19.0/tritonserver2.19.0-jetpack4.6.1.tgz
+# Onnxruntime wheel file
+$ wget https://nvidia.box.com/shared/static/pmsqsiaw4pg9qrbeckcbymho6c01jj4z.whl -O onnxruntime_gpu-1.11.0-cp36-cp36m-linux_aarch64.whl
 ```
 
-```
-python3 --version
-# 3.6.9
-```
-
-
-> pip3 install jupyter
-
-
-> jupyter notebook --ip='*' --port=8888 --allow-root
-
-```python
->>> import tensorrt
->>> tensorrt.__version__
-'8.2.1.8'
->>> PyTorch 
-1.10.0
->>> torchvision 
-0.11.0
-```
-
+### Build Docker Images
+- Torch Jupyter
 ```bash
-tensorrt 변환시 int8 수행 문제
-
- - fp16, int8 관련 [블로그](https://nvidia-ai-iot.github.io/torch2trt/v0.2.0/usage/reduced_precision.html)
-
- -> jetson nano가 int8을 지원하지 않음
-
-  cf) [in8 관련 문의](https://forums.developer.nvidia.com/t/why-jetson-nano-not-support-int8/84060/2)
+$ cd TCL_ModelCompression/
+$ sudo docker build -f Jetson-nano/Dockerfile_TorchJupyter -t torch_jupyter/jetson-nano .
+```
+- Flask Server
+```bash
+$ cd TCL_ModelCompression/
+$ sudo docker build -f Jetson-nano/Dockerfile_FlaskServer -t flask_server/jetson-nano .
+```
+- Flask Client
+```bash
+$ cd TCL_ModelCompression/
+$ sudo docker build -f Jetson-nano/Dockerfile_FlaskClient -t flask_client/jetson-nano .
+```
+- Triton Server
+```bash
+$ cd TCL_ModelCompression/
+$ sudo docker build -f Jetson-nano/Dockerfile_TritonServer -t triton_server/jetson-nano .
+```
+- Tirton Client
+```bash
+$ cd TCL_ModelCompression/
+$ sudo docker build -f Jetson-nano/Dockerfile_TritonClient -t triton_client/jetson-nano .
 ```
 
-### a. imagenet_validset_read_test.ipynb content
- - test complete
+### Download Model Files & Model Local Test
+- Create docker container.
+- When write command in multiple lines with "\\", there should be no characters after "\\". 
+```bash
+$ cd TCL_ModelCompression/
+$ sudo docker run \ 
+-d --gpus all \
+-p <host port>:<container port> \
+-v <host dir>:<container dir> \
+--name torch_jupyter \
+<docker image> \
+jupyter notebook --allow-root \
+--ip 0.0.0.0 --port <container port> \
+--notebook-dir <notebook home dir> --no-browser
+```
+- For Script, ONNX model file
+```bash
+$ cd TCL_ModelCompression/
+$ sudo docker run \
+-d --gpus all \
+-p 8881:8881 \
+-v $(pwd):/TCL_ModelCompression \
+-v ~/ImageNet:/ImageNet \
+--name torch_jupyter \
+torch_jupyter/jetson-nano \
+jupyter notebook --allow-root \
+--ip 0.0.0.0 --port 8881 \
+--notebook-dir /TCL_ModelCompression --no-browser
+```
+- For TensorRT model file
+```bash
+$ cd TCL_ModelCompression/
+$ nohup sudo ~/.local/bin/jupyter notebook --allow-root --ip 0.0.0.0 --port 8881 --no-browser &
+```
 
-#### b. download_base_models.ipynb
- - test complete
+- Check jupyter notebook URL & Token.
+```bash
+$ sudo docker exec torch_jupyter jupyter notebook list
+$ jupyter notebook list
+```
+- Open jupyter notebook and Run model file download codes.
+  - `download_script_models.ipynb`
+  - `download_onnx_models.ipynb`
+  - `download_onnx_tensorrt_models.ipynb`
+- Run jupyter notebook codes in `ModelTest/` directory.
 
-#### c. download_onnx_models.ipynb
 
- - test complete
+### Flask Serving For Desktop (Jetson-Nano)
+- Before run triton model serving, Check `TCL_ModelCompression/Jetson-nano/Flask/Models/` directory.
+- Create flask server container.
+```bash
+$ cd TCL_ModelCompression/
 
- - efficientnet_b7은 수행시 메모리 문제로 파일이 나오지 않음(해결 방법 확인 중)
+$ sudo docker run \
+--rm --gpus all \
+-p <host port>:<container port> \
+-v <host repo home>:<container repo home> \
+--name <container name> \
+flask_server/jetson-nano \
+python3 <container repository>/flask_server.py \
+--model-repository <flask model repository> \
+--model <.pth file> --port <container port>
 
-### d. pytorch > tensorrt test
- - test complete (default setting) - efficinetnet v0 only
+# Example
+$ sudo docker run \
+--rm --gpus all \
+-p 8000:8000 \
+-v $(pwd):/TCL_ModelCompression \
+--name flask_server \
+flask_server/jetson-nano \
+python3 /TCL_ModelCompression/flask_server.py \
+--model-repository=/TCL_ModelCompression/Jetson-nano/Flask/Models \
+--model resnet34-script.pt --port 8000
+```
+- Check flask server response.
+```bash
+$ curl -X GET "http://<ip>:<port>/model"
+# Example
+$ curl -X GET "http://127.0.0.1:8000/model"
+# {"model":"resnet34-script.pt"}
+```
+- Run `jtop_monitor.py` for monitoring gpu memory usage of torch model.
+```bash
+$ cd TCL_ModelCompression/Jetson-nano
+$ sudo python3 jtop_monitor.py --log-file <log_file>
+# Example
+$ sudo python3 jtop_monitor.py --log-file Flask/Monitors/resnet34-script-b1.log
+```
+- Create flask_client container and Run `flask_client.py`.
+```bash
+$ cd TCL_ModelCompression/
 
- - torch_tensorrt not installed / with [torch2trt](https://github.com/NVIDIA-AI-IOT/torch2trt)
+$ sudo docker run \
+--rm --gpus all \
+-v <host repo home>:<container repo home> \
+-v <host imagenet dir>:<container imagenet dir> \
+--name flask_client \
+flask_client/jetson-nano \
+python3 <container repository>/flask_client.py \
+--imagenet-dir <container imagenet dir> \
+--log-file <client log file path> \
+--ip <host ip address> \
+--port <flask server port> \
+--batch-size <batch size> \
+--transform-dir <transform file dir> \
+--loader-workers <loader workers>
 
- -> triton에서 torch_trt가 안되므로 시간이 되면 수행
+# Example
+$ sudo docker run \
+--rm --gpus all \
+-v $(pwd):/TCL_ModelCompression \
+-v ~/ImageNet:/ImageNet \
+--name flask_client \
+flask_client/jetson-nano \
+python3 /TCL_ModelCompression/flask_client.py \
+--imagenet-dir /ImageNet \
+--log-file /TCL_ModelCompression/Jetson-nano/Flask/Results/resnet34-script-b1.log \
+--ip 10.250.72.83 \
+--port 8000 \
+--batch-size 1 \
+--transform-dir /TCL_ModelCompression/Jetson-nano/Transforms \
+--loader-workers 0
+```
 
-### e. pytorch > onmx > tensorrt test
+### Nvidia Triton Serving For Desktop (Jetson-Nano)
+- Before Run Triton Model Serving, Check `TCL_ModelCompression/Jetson-nano/Triton/Models/` directory.
+- Check structure of `TCL_ModelCompression/Jetson-nano/Trition/Models/` directory and `config.pbtxt`.
 
- - onnx 변환 관련 [github](https://github.com/NVIDIA/TensorRT/blob/master/quickstart/IntroNotebooks/4.%20Using%20PyTorch%20through%20ONNX.ipynb)
+- Create triton server container.
+```bash
+$ cd TCL_ModelCompression/
 
- - download_onnx_tensorrt_models.ipynb 수행
+$ sudo docker run \
+--rm --gpus all \
+-v <host model dir>:<triton model repository> \
+-p <host port1>:<trtion HTTP port> \
+-p <host port2>:<trtion gRPC port> \
+-p <host port3>:<trtion Metrics port> \
+--name <container name> \
+triton_server/jetson-nano \
+/app/bin/tritonserver \
+--model-repository=<triton model repository> \
+--backend-dir=<trtiton beckend lib dir>
+--model-control-mode=explicit \
+--load-model=<model_name>
+
+# Example
+$ sudo docker run \
+--rm --gpus all \
+-v $(pwd)/Jetson-nano/Triton/Models:/Models \
+-p 8000:8000 \
+-p 8001:8001 \
+-p 8002:8002 \
+--name triton_server \
+triton_server/jetson-nano \
+/app/bin/tritonserver \
+--model-repository=/Models \
+--backend-directory=/app/backends \
+--model-control-mode=explicit \
+--load-model=resnet34-script
+```
+- Check triton server response
+```bash
+$ curl -X GET "http://<ip>:<port>/metrics"
+# Example
+$ curl -X GET "http://localhost:8002/metrics"
+# Triton Metric Text...
+```
+
+- Run `jtop_monitor.py` for monitoring gpu memory usage of torch model.
+```bash
+$ cd TCL_ModelCompression/Jetson-nano
+$ sudo python3 jtop_monitor.py --target-pid <pid> --log-file <log file>
+# Example
+$ sudo python3 jtop_monitor.py --log-file Triton/Monitors/resnet34-script-grpc-b1.log
+```
+- Create triton_client container and Run `triton_client.py`.
+```bash
+$ cd TCL_ModelCompression/
+
+$ sudo docker run \
+--rm --gpus all \
+-v <host repo home>:<container repo home> \
+-v <host imagenet dir>:<container imagenet dir> \
+--name triton_client \
+triton_client/jetson-nano \
+python3 <container repo home>/triton_client.py \
+--imagenet-dir <container imagenet dir> \
+--log-file <client log file path> \
+--ip <host ip address> \
+--port <triton server port> \
+--protocol <http or grpc> \
+--batch-size <batch size> \
+--transform-dir <transform file dir> \
+--loader-workers <loader workers>
+
+# Example
+$ sudo docker run \
+--rm --gpus all \
+-v $(pwd):/TCL_ModelCompression \
+-v ~/ImageNet:/ImageNet \
+--name triton_client \
+triton_client/jetson-nano \
+python3 /TCL_ModelCompression/triton_client.py \
+--imagenet-dir /ImageNet \
+--log-file /TCL_ModelCompression/Jetson-nano/Triton/Results/resnet34-script-grpc-b1.log \
+--ip 10.250.72.83 \
+--port 8001 \
+--protocol grpc \
+--batch-size 1 \
+--transform-dir /TCL_ModelCompression/Jetson-nano/Transforms \
+--loader-workers 0
+```

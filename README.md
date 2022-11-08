@@ -1,42 +1,5 @@
 # Model Compression Evaluation
 
-## 참고 자료
-- <a href=https://github.com/leejinho610/TRT_Triton_HandsOn>220421 Nvidia AI Developer Meetup Hands-on</a>
-- <a href=https://catalog.ngc.nvidia.com/orgs/nvidia/containers/tensorrt>Nvidia TensorRT Docker Images</a>
-- <a href=https://catalog.ngc.nvidia.com/orgs/nvidia/containers/l4t-tensorrt>Nvidia TenosrRT Docker Images for Jetson</a>
-- <a href=https://github.com/pytorch/TensorRT#compiling-torch-tensorrt>Torch-TensorRT</a>
-- <a href=https://github.com/triton-inference-server/server/tree/main/docs>Nvidia Triton Server Github</a>
-- <a href=https://github.com/triton-inference-server/server/releases>Nvidia Triton Server Realese Note</a>
-- <a href=https://catalog.ngc.nvidia.com/orgs/nvidia/containers/tritonserver>Nvidia Triton Server NGC(Nvidia Gpu Cloud)</a>
-- <a href=https://github.com/NVIDIA/TensorRT/blob/main/quickstart/SemanticSegmentation/tutorial-runtime.ipynb>TensorRT Inference in Python</a>
-
-## R&R
-
-TensorRT는 Container 내에서 작업 필수 (Local System 보호)
- - 박용서 M: TensorRT-Desktop
-   - torch -> torch_trt (FP32, FP16, INT8)
-     - densenet201-torch_trt_fp16.pth
-   - torch -> onnx -> onnx_trt (FP32, FP16, INT8)
-     - densenet201-onnx_trt_fp16.plan
-
-
-- 김경록 M: TensorRT-JetsonNano (INT8 미 지원, torch-trt -> triton 미 지원)
-  - torch -> onnx -> onnx_trt (FP32, FP16)
-    - densenet201-jn-onnx_trt_fp16.plan
-
-- 김경록 M: Pruning
-  - densenet201-pruning.pth
-
--> [pytorch pruning 관련 속도 문제](https://computing-jhson.tistory.com/42)
-
-
-- 이장원 M: Triton Client 개발
-- 이장원 M: Desktop 실험 (Flask)
-- 이장원 M: Jetson Nano 실험 (Flask)
-- Desktop 실험 (Triton)
-- Jetson Nano 실험 (Triton)
-
-
 ## Environments
 - Python3.6 or later
 - PyTorch 1.10.1
@@ -338,3 +301,13 @@ python3 /TCL_ModelCompression/triton_client.py \
 --transform-dir /TCL_ModelCompression/Transforms \
 --loader-workers 2
 ```
+
+## 참고 자료
+- <a href=https://github.com/leejinho610/TRT_Triton_HandsOn>220421 Nvidia AI Developer Meetup Hands-on</a>
+- <a href=https://catalog.ngc.nvidia.com/orgs/nvidia/containers/tensorrt>Nvidia TensorRT Docker Images</a>
+- <a href=https://catalog.ngc.nvidia.com/orgs/nvidia/containers/l4t-tensorrt>Nvidia TenosrRT Docker Images for Jetson</a>
+- <a href=https://github.com/pytorch/TensorRT#compiling-torch-tensorrt>Torch-TensorRT</a>
+- <a href=https://github.com/triton-inference-server/server/tree/main/docs>Nvidia Triton Server Github</a>
+- <a href=https://github.com/triton-inference-server/server/releases>Nvidia Triton Server Realese Note</a>
+- <a href=https://catalog.ngc.nvidia.com/orgs/nvidia/containers/tritonserver>Nvidia Triton Server NGC(Nvidia Gpu Cloud)</a>
+- <a href=https://github.com/NVIDIA/TensorRT/blob/main/quickstart/SemanticSegmentation/tutorial-runtime.ipynb>TensorRT Inference in Python</a>
